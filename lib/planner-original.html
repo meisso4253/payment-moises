@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#6751d3">
+<meta name="description" content="StudyTrack: a local-first student planner MVP. Organize subjects, tasks, deadlines, and study blocks.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%236751d3'/%3E%3Cpath d='M9 10h9q3 0 3 3v19q-3-4-8-4H9zM21 13q3-3 10-3v18q-7 0-10 4' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<title>StudyTrack — Your day, in focus.</title>
+<style>
+:root{--ink:#20233b;--muted:#777b8c;--border:#e8e9f1;--bg:#f7f8fc;--white:#fff;--primary:#6751d3;--primary-dark:#5140b0;--tint:#f0edfc;--teal:#148276;--rose:#b94458;--shadow:0 5px 24px #28234a06;--radius:18px;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;font-size:14px;line-height:1.55}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:var(--primary)}button{border:0;background:none;color:inherit}button:disabled{opacity:.5;cursor:not-allowed}input,select,textarea{color:var(--ink)}button,a,input,select,textarea{outline-offset:4px}button:focus-visible,a:focus-visible{outline:3px solid #8f7cf2}input:focus,select:focus,textarea:focus{outline:3px solid #6751d329;border-color:var(--primary)}svg{display:inline-block;vertical-align:middle;flex-shrink:0}.icon{width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}.skip{position:fixed;top:-90px;left:20px;padding:12px;background:white;z-index:30}.skip:focus{top:12px}
+.sidebar{position:fixed;inset:0 auto 0 0;width:230px;background:#fff;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:34px 20px 22px;z-index:10}.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);font-size:23px;font-weight:780;letter-spacing:-1px;padding:0 10px}.brand-mark{width:36px;height:36px;border-radius:11px;color:white;background:var(--primary);display:grid;place-items:center;box-shadow:0 4px 8px #6751d329}.brand-mark .icon{width:24px;height:24px;stroke-width:1.9}.brand-sub{font-size:9px;letter-spacing:1.15px;color:var(--muted);font-weight:650;margin:12px 0 31px 11px}.nav-title{font-size:10px;letter-spacing:1.7px;font-weight:700;color:#9497a6;margin:0 14px 10px}.nav{display:flex;flex-direction:column;gap:7px}.nav-btn{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 13px;border-radius:10px;color:#74788a;font-weight:550;width:100%;position:relative}.nav-btn:hover{background:#f7f6fb}.nav-btn.active{color:var(--primary);background:var(--tint);font-weight:700}.nav-btn .count{margin-left:auto;font-size:11px;min-width:24px;text-align:center;padding:1px 5px;border-radius:6px;background:#e4defa;color:var(--primary)}.sidebar-bottom{margin-top:auto}.side-note{border:1px solid var(--border);border-radius:14px;padding:15px;margin:28px 3px 15px;background:#fcfcfe}.side-note strong{display:block;font-size:12px;margin:9px 0 4px}.side-note p{font-size:11px;color:var(--muted);line-height:1.65;margin:0}.local-dot{width:7px;height:7px;background:#259585;border-radius:50%;display:inline-block;margin-right:6px}.side-version{font-size:10px;color:#9497a6;padding:0 12px}.app-shell{margin-left:230px;min-height:100vh}.topbar{height:88px;padding:0 40px;border-bottom:1px solid var(--border);background:#ffffffc9;display:flex;align-items:center;justify-content:space-between;gap:14px}.breadcrumbs{font-size:12px;color:var(--muted)}.breadcrumbs strong{color:#44495d;font-weight:550}.breadcrumbs span{margin:0 11px;color:#b2b4be}.top-actions{display:flex;align-items:center;gap:16px}.date-label{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--muted)}.avatar{width:34px;height:34px;border-radius:50%;background:#eeeafb;color:var(--primary);font-size:12px;font-weight:750;display:grid;place-items:center}.topbar .mobile-brand{display:none}main{max-width:1580px;margin:0 auto;padding:30px 40px 42px;min-width:0}.page-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.eyebrow{color:var(--primary);font-size:10px;letter-spacing:1.8px;font-weight:750;text-transform:uppercase;margin-bottom:7px}h1,h2,h3,p{margin-top:0}h1{font-size:29px;letter-spacing:-.8px;margin-bottom:4px;line-height:1.25;font-weight:730}h2{font-size:16px;letter-spacing:-.2px;font-weight:700;margin:0}h3{font-size:15px;line-height:1.45;margin-bottom:7px}.subheading{font-size:13px;color:var(--muted);margin:0}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:10px 16px;border-radius:9px;font-size:12px;font-weight:650;white-space:nowrap;transition:background .15s,transform .15s}.button.primary{background:var(--primary);color:white;box-shadow:0 3px 6px #6751d317}.button.primary:hover{background:var(--primary-dark)}.button.secondary{background:white;border:1px solid #dfdfec;color:#565b70}.button.secondary:hover{background:#f6f5fc}.button.soft{background:var(--tint);color:var(--primary)}.button.danger{background:#fff0f2;color:#a83748}.button.danger:hover{background:#fde3e7}.button.small{padding:7px 12px;min-height:34px;font-size:11px}.text-button{color:var(--primary);font-size:12px;font-weight:650;padding:5px}.text-button:hover{text-decoration:underline}.icon-btn{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;color:#9395a4}.icon-btn:hover{background:#f0eef9;color:var(--primary)}.row-actions{display:flex;gap:3px;align-items:center}.panel{background:white;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:21px 23px 17px}.panel-sub{font-size:11px;color:var(--muted);margin:5px 0 0}.panel-pad{padding:23px}.notice{padding:11px 16px;border:1px solid #e7e1fa;background:#f3effe;border-radius:10px;color:#645487;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.notice.warning{background:#fff7e8;border-color:#f2dfb6;color:#865e21}.notice .text-button{white-space:nowrap}.notice p{margin:0}.notice .icon{margin-right:5px}.hero{display:grid;grid-template-columns:minmax(0,1fr) 245px;background:#eeebfc;border:1px solid #e4dff7;border-radius:18px;overflow:hidden;margin-bottom:21px;min-height:178px}.hero-copy{padding:26px 29px;position:relative;z-index:1}.hero h2{font-size:28px;letter-spacing:-.8px;line-height:1.23;font-weight:730;max-width:440px;margin-bottom:10px}.hero p{font-size:12px;color:#7a7197;max-width:435px;margin-bottom:13px}.hero .text-button{padding:0;display:inline-flex;align-items:center;gap:5px}.hero-art{position:relative;display:flex;align-items:center;justify-content:center;padding:20px;border-left:1px solid #e4dff7;background:radial-gradient(circle at 70% 45%,#e1dafa 0%,#eeebfc 69%)}.hero-art:before{content:'';position:absolute;width:184px;height:184px;border:1px solid #d8d0f3;border-radius:50%;transform:translate(12px,8px)}.hero-art:after{content:'';position:absolute;width:226px;height:226px;border:1px dashed #d8d0f3;border-radius:50%;transform:translate(12px,8px)}.hero-card{position:relative;z-index:1;width:170px;border:1px solid #fff;background:#ffffffdb;border-radius:13px;padding:15px;transform:rotate(-5deg);box-shadow:0 14px 26px #53418b0c}.hero-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;font-weight:650;margin-bottom:16px}.small-check{width:23px;height:23px;border-radius:7px;background:#e9e4fb;color:var(--primary);display:grid;place-items:center}.small-check .icon{width:15px;height:15px}.hero-card strong{font-size:28px;letter-spacing:-1px}.hero-card .bar{margin:9px 0 7px}.hero-card p{font-size:9px;margin:0;color:#9790aa}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:25px}.metric{padding:17px 20px;background:#fff;border:1px solid var(--border);border-radius:13px}.metric-top{display:flex;justify-content:space-between;align-items:center;gap:6px;color:var(--muted);font-size:11px;font-weight:550}.metric-icon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:#efebfc;color:var(--primary)}.metric-icon.rose{background:#fceef0;color:#bd5d6d}.metric-icon.teal{background:#e8f6f1;color:#37907f}.metric-icon.amber{background:#fff5e5;color:#b68a3e}.metric-value{font-size:30px;font-weight:730;letter-spacing:-1px;line-height:1.2;margin:8px 0 4px}.metric-foot{font-size:10px;color:#9497a6}.overview-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(275px,1fr);gap:22px}.column-stack{display:flex;flex-direction:column;gap:20px;min-width:0}.table-head{display:grid;grid-template-columns:minmax(0,1fr) 94px 72px;padding:10px 23px;background:#fafafe;border-top:1px solid #f0f0f6;border-bottom:1px solid #f0f0f6;font-size:9px;color:#9699a9;text-transform:uppercase;letter-spacing:1px;gap:12px}.task-row{display:flex;align-items:center;gap:13px;padding:16px 22px;border-bottom:1px solid #f1f1f7;min-width:0}.task-row:last-child{border-bottom:0}.task-row:hover{background:#fdfdff}.task-check{flex:0 0 18px;width:18px;height:18px;padding:0;border:1.5px solid #d5d5e2;border-radius:6px;display:grid;place-items:center;background:white}.task-check:hover{border-color:var(--primary);background:#f3f0fd}.task-check.done{background:var(--primary);border-color:var(--primary);color:white}.task-check .icon{width:12px;height:12px;stroke-width:2.7}.task-body{min-width:0;flex:1;text-align:left;padding:0}.task-title{display:block;font-size:12px;font-weight:620;color:#3f4258;overflow-wrap:anywhere;line-height:1.5}.task-row.is-done .task-title{text-decoration:line-through;color:#9699a8}.task-meta{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap;font-size:10px;color:#979aaa}.subject-label{display:inline-flex;align-items:center;gap:6px;max-width:100%}.dot{width:6px;height:6px;background:var(--accent,#8e91a4);border-radius:50%;display:inline-block;flex-shrink:0}.subject-code{color:var(--accent,#8e91a4);font-weight:650}.task-due{font-size:10px;min-width:82px;max-width:100px;color:#8a8d9f;line-height:1.6;text-align:left}.task-due strong{display:block;color:#62677c;font-size:11px;font-weight:550}.task-due.overdue strong{color:#b75865}.task-due.today strong{color:#7760c8}.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;font-size:9px;font-weight:650;white-space:nowrap;line-height:1.5}.badge.high{color:#b55b69;background:#fbeff1}.badge.medium{color:#a57b37;background:#fcf4e5}.badge.low{color:#398578;background:#eaf5f1}.badge.progress{color:#7355bd;background:#f1ecfb}.badge.done{color:#398578;background:#eaf5f1}.badge.todo{color:#828499;background:#f0f1f7}.badge.neutral{color:#757b8c;background:#f4f5fa}.overview-tasks .task-row>.badge{min-width:57px;justify-content:center}.panel-foot{border-top:1px solid #f0f0f6;padding:12px 23px;font-size:10px;color:var(--muted)}.week-chart{display:flex;align-items:flex-end;gap:10px;height:118px;padding:0 24px 0;margin:2px 0 16px}.chart-day{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;font-size:9px;color:#9699a9}.chart-value{font-size:9px;color:#85809e}.chart-bar{width:100%;max-width:26px;height:calc(var(--height)*1px);border-radius:5px 5px 3px 3px;background:#e5dff8;min-height:4px}.chart-day.today .chart-bar{background:#8770df}.chart-day.today{color:var(--primary);font-weight:750}.chart-caption{margin:0 23px 17px;font-size:10px;color:var(--muted)}.next-step{background:#f3f8f7;border-color:#e0eeea}.next-step .eyebrow{color:#518f80}.next-step h3{font-size:15px}.next-step p{color:#7b938d;font-size:11px;margin-bottom:16px}.next-step .button{background:#fff;color:#427e71;border:1px solid #dcebe5}.subject-mini{display:flex;align-items:center;gap:11px;padding:12px 23px}.subject-mini:last-child{padding-bottom:22px}.subject-symbol{width:33px;height:33px;border-radius:9px;display:grid;place-items:center;background:var(--light);color:var(--accent);font-size:10px;font-weight:750;flex-shrink:0}.subject-mini-info{flex:1;min-width:0}.subject-mini-name{font-size:11px;font-weight:600;color:#585e75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{display:block;height:5px;background:#f0edf9;border-radius:10px;overflow:hidden}.bar>span{display:block;height:100%;background:var(--accent,var(--primary));border-radius:inherit}.subject-mini .bar{margin-top:7px;max-width:200px;height:4px}.mini-count{font-size:10px;color:#9699a9;flex-shrink:0}.color-violet{--accent:#8163d2;--light:#f1ecfc}.color-teal{--accent:#338c81;--light:#e8f6f1}.color-amber{--accent:#ac823a;--light:#fcf3e1}.color-blue{--accent:#5f89cd;--light:#edf3fd}.color-rose{--accent:#bb6c86;--light:#fbeef3}.color-slate{--accent:#7c819c;--light:#f1f2f8}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:17px}.search-field{position:relative;min-width:200px;flex:1}.search-field>.icon{position:absolute;left:13px;top:12px;color:#a0a2b4;width:17px;height:17px}.search-field input{padding-left:39px;width:100%}.control,input,select,textarea{background:#fff;border:1px solid #e1e2ec;border-radius:9px;padding:10px 12px;font-size:12px;min-height:41px;max-width:100%}.control{width:auto;min-width:125px}textarea{resize:vertical;min-height:95px}.tabs{display:flex;flex-wrap:wrap;gap:5px;padding:0 0 17px}.tab{padding:7px 13px;border-radius:7px;font-size:11px;color:#868a9e;font-weight:550}.tab:hover{background:#f0edf9}.tab.active{background:var(--tint);color:var(--primary);font-weight:700}.tab .tab-count{font-size:10px;margin-left:5px;opacity:.75}.tasks-list .task-row{gap:14px;padding:18px 22px}.tasks-list .task-title{font-size:13px}.tasks-list .task-meta{font-size:10px}.task-status-col{min-width:86px;text-align:center}.list-summary{display:flex;justify-content:space-between;font-size:11px;color:#9296a7;margin:14px 1px 0}.empty{padding:43px 25px;text-align:center;color:var(--muted)}.empty-symbol{width:46px;height:46px;border-radius:14px;background:var(--tint);color:var(--primary);display:grid;place-items:center;margin:0 auto 13px}.empty h3{font-size:15px;color:#5c6076;margin:0 0 5px}.empty p{font-size:12px;max-width:320px;margin:0 auto 15px}.subjects-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}.subject-card{padding:23px;display:flex;flex-direction:column;min-height:208px}.subject-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}.subject-card .subject-symbol{width:40px;height:40px;font-size:12px}.subject-card h3{overflow-wrap:anywhere;flex:1}.subject-card .bar{margin-top:13px}.subject-card .small-label{font-size:10px;color:var(--muted);margin:10px 0 0}.subject-card-bottom{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:12px}.week-top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:18px;flex-wrap:wrap}.week-controls{display:flex;align-items:center;gap:7px}.week-range{font-size:16px;font-weight:650;margin-left:10px;letter-spacing:-.2px}.week-legend{display:flex;gap:17px;color:var(--muted);font-size:10px;align-items:center}.legend-square{display:inline-block;width:7px;height:7px;border-radius:2px;background:#f3ecff;border:1px solid #b7a5e5;margin-right:5px}.legend-square.session{background:#edf6f3;border-color:#6eb69f}.week-scroll{overflow-x:auto;border-radius:14px}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(133px,1fr));min-width:931px;background:#fff;border:1px solid var(--border);border-radius:14px;min-height:445px}.day-col{padding:0 10px 16px;border-right:1px solid var(--border);min-width:0}.day-col:last-child{border:0}.day-head{padding:17px 0 13px;display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;border-bottom:1px solid #f0f0f6}.day-head small{font-size:10px;color:#9599aa;display:block}.day-number{font-size:20px;font-weight:600;letter-spacing:-.5px}.day-col.is-today{background:#fcfbff}.day-col.is-today .day-number{background:var(--primary);color:#fff;display:inline-grid;width:30px;height:30px;place-items:center;border-radius:9px;font-size:17px;margin-top:3px}.day-card{display:block;width:100%;text-align:left;background:var(--light,#f5f3fb);border:1px solid #dcd6f144;border-left:3px solid var(--accent,#8974ca);border-radius:7px;padding:10px 8px;margin-bottom:9px;overflow:hidden}.day-card:hover{filter:brightness(.975)}.day-card.session{background:#f0f7f4;border-left-color:#77aa98}.day-card strong{font-size:10px;line-height:1.5;display:block;overflow-wrap:anywhere;font-weight:650}.day-card small{font-size:9px;color:#88879c;display:block;margin-top:5px}.day-card .day-kind{font-size:8px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;color:var(--accent,#7c7198)}.day-card.is-done{opacity:.55}.day-card.is-done strong{text-decoration:line-through}.day-empty{font-size:10px;color:#b3b5c3;padding:23px 0;text-align:center}.week-note{font-size:11px;color:var(--muted);margin:15px 0 0}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.settings-grid h3{margin-bottom:10px}.settings-grid p,.settings-grid li{font-size:12px;color:var(--muted)}.settings-grid ul,.settings-grid ol{padding-left:19px;margin-bottom:0}.settings-grid li{margin-bottom:7px}.settings-grid .button{margin-right:5px;margin-bottom:7px}.settings-grid .field{margin-bottom:16px}.help-note{padding:12px;background:#faf9ff;border-radius:9px;font-size:11px;color:#827799;margin:12px 0}.footer-note{margin-top:28px;display:flex;gap:12px;justify-content:space-between;color:#aaadba;font-size:10px}.footer-note button{font-size:10px;color:#9b94b6}.mobile-nav{display:none}.main-footer{font-size:10px;color:#a2a6b6}
+dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 100px #2420392b;width:min(550px,calc(100% - 30px));max-height:calc(100dvh - 36px);color:var(--ink);background:#fff}dialog::backdrop{background:#29233866;backdrop-filter:blur(4px)}.dialog-head{display:flex;align-items:flex-start;justify-content:space-between;padding:23px 25px 15px;gap:15px}.dialog-head h2{font-size:20px;letter-spacing:-.5px;margin:1px 0 5px}.dialog-head p{font-size:11px;color:var(--muted);margin:0}.dialog-body{padding:3px 25px 23px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field.full{grid-column:1/-1}.field label,.field-label{font-size:11px;font-weight:650;color:#65677f}.field input,.field select,.field textarea{width:100%}.field small{font-size:10px;color:#999bad}.form-actions{display:flex;align-items:center;justify-content:flex-end;gap:9px;border-top:1px solid var(--border);margin-top:22px;padding-top:18px}.form-actions .delete-action{margin-right:auto;color:#bb6370}.error-message{border:1px solid #f5d8de;background:#fff3f5;padding:10px 12px;border-radius:8px;font-size:12px;color:#a34254;margin:12px 0 0}.welcome{max-width:495px}.welcome .dialog-body{padding:7px 30px 28px}.welcome .welcome-icon{width:55px;height:55px;border-radius:16px;background:var(--primary);color:white;display:grid;place-items:center;margin:28px 30px 0}.welcome .welcome-icon .icon{width:33px;height:33px}.welcome h2{font-size:31px;letter-spacing:-1px;line-height:1.15;margin:19px 0 13px}.welcome p{font-size:13px;color:#88899e;line-height:1.7}.welcome-options{display:flex;gap:10px;margin-top:21px}.welcome-options .button{flex:1}.welcome-note{font-size:10px!important;margin:15px 0 0!important;color:#aaa6ba!important}.swatches{display:flex;gap:10px;padding-top:4px}.swatch-label{width:31px;height:31px;position:relative;cursor:pointer}.swatch-label input{position:absolute;inset:0;opacity:0;margin:0}.swatch-circle{border:3px solid white;outline:1px solid #eceaf3;background:var(--accent);display:block;width:31px;height:31px;border-radius:50%}.swatch-label input:checked+.swatch-circle{outline:2px solid var(--accent)}.swatch-label input:focus-visible+.swatch-circle{outline:3px solid var(--ink)}.toast-area{position:fixed;bottom:25px;left:calc(50% + 90px);transform:translateX(-50%);z-index:60;width:min(490px,calc(100% - 30px));pointer-events:none}.toast{pointer-events:auto;background:#28243e;color:#fff;box-shadow:0 8px 30px #27213d24;border-radius:11px;padding:12px 15px;display:flex;gap:13px;align-items:center;margin-top:8px;font-size:12px}.toast span{flex:1;overflow-wrap:anywhere}.toast button{font-size:11px;color:#d1c8ff;font-weight:700}.toast .icon{color:#b6a5f4}.toast.error{background:#6d3443}.confirm-text{font-size:13px;color:var(--muted);line-height:1.7;margin:1px 0}.kbd{font-family:inherit;border:1px solid #e4e1ee;border-radius:5px;padding:1px 5px;font-size:10px;color:#9994ae}.session-warning{font-size:11px;background:#fff8e7;padding:10px 12px;border-radius:8px;color:#8d723d;margin-top:12px}
+@media(min-width:1580px){.overview-grid{grid-template-columns:minmax(0,1.8fr) minmax(305px,1fr)}main{padding-top:36px}.hero{min-height:200px}.hero-copy{padding:31px 34px}.hero h2{font-size:31px}}
+@media(max-width:1200px){.sidebar{width:210px;padding-left:15px;padding-right:15px}.app-shell{margin-left:210px}.topbar{padding:0 25px}main{padding:26px 25px}.overview-grid{grid-template-columns:minmax(0,1.5fr) minmax(250px,1fr);gap:17px}.task-row{padding:15px 16px;gap:10px}.task-due{min-width:70px}.panel-head{padding:19px 18px 15px}.metrics{gap:11px}.metric{padding:14px 15px}.subjects-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{grid-template-columns:minmax(0,1fr) 205px}}
+@media(max-width:1020px){.overview-grid{grid-template-columns:1fr}.overview-grid>.column-stack:last-child{display:grid;grid-template-columns:1fr 1fr;align-items:stretch}.overview-grid>.column-stack:last-child>.next-step{grid-column:1/-1}.date-label{font-size:11px}.tasks-list .task-status-col{display:none}.hero h2{font-size:26px}.settings-grid{grid-template-columns:1fr}.task-row{padding:16px 20px}.overview-tasks .table-head{grid-template-columns:minmax(0,1fr) 87px 62px}.subjects-grid{gap:14px}}
+@media(max-width:700px){body{font-size:13px}.sidebar{display:none}.app-shell{margin-left:0;padding-bottom:80px}.topbar{height:70px;padding:0 19px}.topbar .mobile-brand{display:flex;gap:9px;padding:0;font-size:21px}.topbar .mobile-brand .brand-mark{width:30px;height:30px;border-radius:9px}.topbar .mobile-brand .icon{width:21px;height:21px}.breadcrumbs,.date-label{display:none}.top-actions{gap:7px}main{padding:23px 18px 27px}.page-heading{align-items:flex-start;margin-bottom:20px;gap:10px}.page-heading>.button{margin-top:4px}h1{font-size:25px}.subheading{font-size:11px;max-width:230px}.button{font-size:11px;padding:9px 12px;min-height:38px}.button .icon{width:16px;height:16px}.hero{grid-template-columns:1fr 125px;min-height:167px}.hero-copy{padding:22px 19px}.hero h2{font-size:23px;margin-bottom:10px}.hero p{font-size:10px;margin-bottom:13px}.hero-art{padding:10px;border:0}.hero-card{width:110px;padding:11px;border-radius:10px}.hero-card strong{font-size:24px}.hero-card-top{font-size:8px;gap:5px;margin-bottom:9px}.hero-card p{font-size:8px}.small-check{width:19px;height:19px}.hero-art:after{width:155px;height:155px}.hero-art:before{width:130px;height:130px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-bottom:20px}.metric{padding:13px 15px}.metric-value{font-size:27px;margin-top:5px}.metric-foot{font-size:9px}.overview-grid{gap:18px}.overview-grid>.column-stack:last-child{display:flex}.table-head{padding:10px 16px;grid-template-columns:minmax(0,1fr) 76px 49px!important;gap:9px;font-size:8px}.task-row{padding:15px 15px;gap:9px}.task-title{font-size:11px}.task-due{min-width:69px;max-width:73px;font-size:9px}.task-due strong{font-size:10px}.overview-tasks .task-row>.badge{min-width:45px;padding:3px 5px;font-size:8px}.task-check{width:17px;height:17px;flex-basis:17px}.task-meta{font-size:9px;gap:5px}.task-meta .status-inline{display:none}.panel-head{padding:19px 17px 15px}.panel-head h2{font-size:15px}.notice{padding:10px 12px;font-size:10px;align-items:flex-start}.notice .text-button{font-size:10px}.notice .icon{width:14px;height:14px;margin-right:2px}.panel-sub{font-size:10px}.subjects-grid{grid-template-columns:1fr}.subject-card{min-height:190px}.task-row .row-actions{display:none}.tasks-list .task-row{padding:17px 14px;gap:10px;flex-wrap:wrap}.tasks-list .task-title{font-size:12px}.tasks-list .task-body{flex-basis:calc(100% - 30px)}.tasks-list .task-due{margin-left:27px;max-width:none;display:flex;gap:7px;align-items:center;font-size:10px}.tasks-list .task-due strong{font-size:10px}.tasks-list .task-row>.badge{font-size:9px}.toolbar{gap:8px}.search-field{flex-basis:100%}.toolbar .control{flex:1;width:110px;min-width:105px;font-size:11px}.tabs{gap:1px}.tab{padding:7px 9px;font-size:10px}.week-range{font-size:14px;margin-left:4px}.week-grid{min-width:1015px;grid-template-columns:repeat(7,145px)}.day-card strong{font-size:11px}.day-head .icon-btn{width:28px}.week-legend{font-size:9px;gap:13px}.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:15;background:#fffffff5;border-top:1px solid var(--border);padding:8px 8px max(8px,env(safe-area-inset-bottom));justify-content:space-around;box-shadow:0 -5px 20px #4d437e04}.mobile-nav button{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;padding:6px 9px;color:#9896aa;font-size:9px;font-weight:550;min-width:56px;border-radius:9px}.mobile-nav button.active{color:var(--primary);background:#f1edfc}.mobile-nav .icon{width:20px;height:20px}.footer-note{font-size:9px;flex-wrap:wrap;gap:5px}.footer-note button{font-size:9px}.toast-area{bottom:84px;left:50%}.form-grid{gap:13px}.dialog-head{padding:22px 20px 15px}.dialog-body{padding:3px 20px 21px}.dialog-head h2{font-size:20px}.field input,.field textarea,.field select{font-size:16px}.field label{font-size:11px}.welcome h2{font-size:28px}.welcome-options{flex-direction:column}.welcome .field input{font-size:16px}.welcome .dialog-body{padding-left:25px;padding-right:25px}.welcome .welcome-icon{margin-left:25px}.settings-grid .panel-pad{padding:20px}.form-actions{flex-wrap:wrap}.hero-card .bar{height:4px}}
+@media(max-width:380px){main{padding-left:13px;padding-right:13px}.hero{grid-template-columns:1fr 108px}.hero-copy{padding:19px 14px}.hero h2{font-size:22px}.hero-card{width:99px}.metric-top{font-size:10px}.task-due{min-width:64px}.mobile-nav button{min-width:52px;padding:6px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media print{.sidebar,.topbar,.mobile-nav,.page-heading>.button,.notice,.toolbar,.tabs,.row-actions,.toast-area,.footer-note,.week-controls button,.day-head button,.text-button,.panel-foot button{display:none!important}.app-shell{margin:0;padding:0}main{padding:0}body{background:#fff}.panel,.metric,.hero{box-shadow:none;break-inside:avoid}.week-scroll{overflow:visible}.week-grid{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}.day-col{padding:0 5px 10px}.overview-grid{grid-template-columns:1fr}.overview-grid>.column-stack:last-child{display:none}.task-row{break-inside:avoid}.hero{min-height:150px}.hero-copy{padding:20px}.hero-art{display:none}.hero{display:block}.task-check{border-color:#777}.subject-card{break-inside:avoid}.task-status-col{display:none}}
+
+</style>
+</head>
+<body>
+<div id="app"></div>
+<noscript><div style="padding:35px;font-family:system-ui"><h1>StudyTrack needs JavaScript.</h1><p>Open this HTML file in a desktop browser with JavaScript enabled. No internet connection is needed for the downloaded single-file app.</p></div></noscript>
+<script>
+/* StudyTrack 0.1.0 — pure data and date helpers. No network or dependencies. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.StudyTrackCore = api;
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  const SCHEMA = 1;
+  const COLORS = ['violet', 'teal', 'amber', 'blue', 'rose', 'slate'];
+  const TYPES = ['Assignment', 'Quiz', 'Exam', 'Project', 'Reading', 'Other'];
+  const STATUS = ['todo', 'progress', 'done'];
+  const PRIORITY = ['high', 'medium', 'low'];
+  const pad = n => String(n).padStart(2, '0');
+  function dateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function localValue(d) { return `${dateKey(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  // Parse wall-clock local time explicitly; never interpret date-only strings as UTC.
+  function parseLocal(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return null;
+    const [y,m,d,h,min] = value.match(/\d+/g).map(Number);
+    if (y < 1900 || y > 2200) return null;
+    const result = new Date(y,m-1,d,h,min,0,0);
+    return result.getFullYear() === y && result.getMonth() === m-1 && result.getDate() === d && result.getHours() === h && result.getMinutes() === min ? result : null;
+  }
+  function addDays(date, days) { const d = new Date(date); d.setDate(d.getDate()+days); return d; }
+  function startDay(date) { const d = new Date(date); d.setHours(0,0,0,0); return d; }
+  function weekStart(date) { const d=startDay(date); return addDays(d,-((d.getDay()+6)%7)); }
+  function uid(prefix='item') {
+    const v = typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,12)}`;
+    return `${prefix}-${v}`;
+  }
+  function blank(name='') { return {schemaVersion:SCHEMA, updatedAt:0, mode:'personal', profile:{name}, subjects:[], tasks:[], sessions:[]}; }
+  function sample(now=new Date(), name='') {
+    const s=blank(name); s.mode='sample';
+    s.subjects=[
+      {id:'s-mechanics',code:'CE 201',name:'Mechanics of Deformable Bodies',color:'violet'},
+      {id:'s-economy',code:'ECON 313',name:'Engineering Economy',color:'teal'},
+      {id:'s-techno',code:'TECHNO',name:'Technopreneurship',color:'amber'},
+      {id:'s-hydro',code:'CE 203',name:'Hydrology',color:'blue'},
+      {id:'s-survey',code:'CE 204',name:'Surveying',color:'rose'}
+    ];
+    const at=(days,hour=23,minute=59)=>{const d=addDays(now,days);d.setHours(hour,minute,0,0);return localValue(d);};
+    const specs=[
+      ['Normal stress problem set','s-mechanics',0,'high','progress','Assignment',60],
+      ['Annuity practice exercises','s-economy',1,'high','todo','Assignment',45],
+      ['Customer persona draft','s-techno',2,'medium','todo','Project',50],
+      ['Rainfall data summary','s-hydro',3,'medium','todo','Assignment',45],
+      ['Leveling field notes','s-survey',-1,'high','todo','Assignment',30],
+      ['Review for mechanics quiz','s-mechanics',5,'medium','todo','Quiz',60],
+      ['Value proposition statement','s-techno',7,'low','todo','Project',30],
+      ['Simple interest worksheet','s-economy',-2,'medium','done','Assignment',30],
+      ['Read hydrology introduction','s-hydro',-1,'low','done','Reading',25]
+    ];
+    s.tasks=specs.map((t,i)=>({id:`task-sample-${i}`,title:t[0],subjectId:t[1],dueAt:at(t[2]),priority:t[3],status:t[4],type:t[5],effortMinutes:t[6],notes:'Fictional task for the classroom demonstration. Replace this with your own requirement.',createdAt:now.toISOString(),completedAt:t[4]==='done'?now.toISOString():null}));
+    s.sessions=[
+      {id:'session-sample-1',title:'Practice stress problems',subjectId:'s-mechanics',startAt:at(0,18,0),durationMinutes:45,done:false,notes:'Work through one problem at a time.'},
+      {id:'session-sample-2',title:'Annuity review',subjectId:'s-economy',startAt:at(1,17,0),durationMinutes:60,done:false,notes:''},
+      {id:'session-sample-3',title:'Organize field notes',subjectId:'s-survey',startAt:at(3,10,0),durationMinutes:30,done:false,notes:''}
+    ];
+    return s;
+  }
+  function isOverdue(t,now=new Date()) { return t.status!=='done' && parseLocal(t.dueAt) < now; }
+  function stats(state,now=new Date()) {
+    const active=state.tasks.filter(t=>t.status!=='done');
+    const end=addDays(startDay(now),7);
+    return {total:state.tasks.length,completed:state.tasks.length-active.length,open:active.length,
+      today:active.filter(t=>t.dueAt.slice(0,10)===dateKey(now)).length,
+      overdue:active.filter(t=>isOverdue(t,now)).length,
+      upcoming:active.filter(t=>parseLocal(t.dueAt)>=now && parseLocal(t.dueAt)<end).length,
+      percent:state.tasks.length?Math.round(100*(state.tasks.length-active.length)/state.tasks.length):0};
+  }
+  function sortTasks(tasks,sort='deadline') {
+    return [...tasks].sort((a,b)=>{
+      const done=(a.status==='done')-(b.status==='done'); if(done)return done;
+      if(sort==='priority')return PRIORITY.indexOf(a.priority)-PRIORITY.indexOf(b.priority)||a.dueAt.localeCompare(b.dueAt)||a.title.localeCompare(b.title);
+      return a.dueAt.localeCompare(b.dueAt)||PRIORITY.indexOf(a.priority)-PRIORITY.indexOf(b.priority)||a.title.localeCompare(b.title);
+    });
+  }
+  function sessionOverlaps(candidate,sessions) {
+    const a=parseLocal(candidate.startAt).getTime(), b=a+candidate.durationMinutes*60000;
+    return sessions.some(s=>{if(s.id===candidate.id)return false;const c=parseLocal(s.startAt).getTime(),d=c+s.durationMinutes*60000;return a<d&&b>c;});
+  }
+  // Import only an explicitly recognized schema. Rebuild objects instead of merging unknown input.
+  function validateState(raw) {
+    const fail=msg=>{throw new Error(msg);};
+    if(!raw || typeof raw!=='object' || Array.isArray(raw) || raw.schemaVersion!==SCHEMA)fail('This is not a supported StudyTrack v1 backup.');
+    const text=(v,label,max,min=0)=>{if(typeof v!=='string'||v.length>max||v.trim().length<min)fail(`${label} is missing or too long.`);return v;};
+    const id=v=>{if(typeof v!=='string'||!/^[A-Za-z0-9_-]{1,90}$/.test(v))fail('Invalid record identifier.');return v;};
+    const choice=(v,arr,label)=>{if(!arr.includes(v))fail(`Invalid ${label}.`);return v;};
+    const number=(v,min,max,label)=>{if(!Number.isInteger(v)||v<min||v>max)fail(`Invalid ${label}.`);return v;};
+    const date=(v,label)=>{if(!parseLocal(v))fail(`Invalid ${label}.`);return v;};
+    const iso=v=>{if(typeof v!=='string'||v.length>40||!Number.isFinite(Date.parse(v)))fail('Invalid timestamp.');return v;};
+    const arr=(v,max,label)=>{if(!Array.isArray(v)||v.length>max||v.some(r=>!r||typeof r!=='object'||Array.isArray(r)))fail(`Invalid ${label} list.`);return v;};
+    const unique=rows=>{if(new Set(rows.map(r=>r.id)).size!==rows.length)fail('Duplicate record identifiers.');};
+    const output=blank(text(raw.profile?.name,'Display name',40));
+    output.mode=choice(raw.mode,['sample','personal'],'planner mode');
+    output.updatedAt=typeof raw.updatedAt==='number'&&Number.isFinite(raw.updatedAt)&&raw.updatedAt>=0?raw.updatedAt:0;
+    output.subjects=arr(raw.subjects,100,'subjects').map(s=>({id:id(s.id),name:text(s.name,'Subject name',90,1),code:text(s.code,'Subject code',20),color:choice(s.color,COLORS,'subject color')}));
+    unique(output.subjects);
+    const subject=v=>{if(v===null)return null;if(!output.subjects.some(s=>s.id===v))fail('A task or session refers to a missing subject.');return v;};
+    output.tasks=arr(raw.tasks,5000,'tasks').map(t=>({id:id(t.id),title:text(t.title,'Task title',140,1),subjectId:subject(t.subjectId),type:choice(t.type,TYPES,'task type'),priority:choice(t.priority,PRIORITY,'priority'),status:choice(t.status,STATUS,'status'),dueAt:date(t.dueAt,'deadline'),effortMinutes:number(t.effortMinutes,0,1440,'estimated minutes'),notes:text(t.notes,'Task notes',4000),createdAt:iso(t.createdAt),completedAt:t.completedAt===null?null:iso(t.completedAt)}));
+    unique(output.tasks);
+    output.sessions=arr(raw.sessions,5000,'sessions').map(s=>{if(typeof s.done!=='boolean')fail('Invalid session status.');return {id:id(s.id),title:text(s.title,'Session title',140,1),subjectId:subject(s.subjectId),startAt:date(s.startAt,'session date'),durationMinutes:number(s.durationMinutes,5,480,'session duration'),notes:text(s.notes,'Session notes',4000),done:s.done};});
+    unique(output.sessions);
+    return output;
+  }
+  function escapeHTML(v) {return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  return Object.freeze({SCHEMA,COLORS,TYPES,STATUS,PRIORITY,dateKey,localValue,parseLocal,addDays,startDay,weekStart,uid,blank,sample,isOverdue,stats,sortTasks,sessionOverlaps,validateState,escapeHTML});
+});
+
+</script>
+<script>
+/* StudyTrack 0.1.0 — local-first interface. No accounts, API keys, or network requests. */
+(() => {
+  'use strict';
+  const C=window.StudyTrackCore, E=C.escapeHTML, KEY='studytrack_mvp_v1';
+  const ICONS={
+    book:'<path d="M4 4h6a3 3 0 0 1 3 3v14a4 4 0 0 0-4-2H4z"/><path d="M13 7a3 3 0 0 1 3-3h4v15h-4a4 4 0 0 0-3 2"/><path d="m7 11 2 2 4-4"/>',
+    grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    tasks:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="m7 9 1 1 2-2m-3 7 1 1 2-2m3-5h4m-4 6h4"/>',
+    calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 11h18m-14 4h2m6 0h2m-10 3h2"/>',
+    subjects:'<path d="M4 3h12a3 3 0 0 1 3 3v15H6a3 3 0 0 1-3-3V6a3 3 0 0 1 1-3Z"/><path d="M3 17h16M8 7h6m-6 4h4"/>',
+    settings:'<path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="currentColor" stroke="none"/><circle cx="15" cy="17" r="3" fill="currentColor" stroke="none"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',
+    left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m10 6 6 6-6 6"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    check:'<path d="m5 12 4 4L19 6"/>',
+    checkCircle:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+    alert:'<path d="m10.3 4-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0Z"/><path d="M12 9v5m0 3h.01"/>',
+    x:'<path d="m6 6 12 12M6 18 18 6"/>',
+    edit:'<path d="m14 4 6 6M4 20l4-1 12-12a2 2 0 0 0-4-4L4 15z"/>',
+    trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',
+    download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',
+    upload:'<path d="M12 16V4m-5 5 5-5 5 5M4 16v5h16v-5"/>',
+    shield:'<path d="M12 3 3 7v5c0 5 9 9 9 9s9-4 9-9V7z"/><path d="m8 12 3 3 5-6"/>',
+    search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+    flag:'<path d="M4 22V3m0 1c5-5 10 5 16 0v10c-6 5-11-5-16 0"/>',
+    spark:'<path d="m12 3 2.8 6.2L21 12l-6.2 2.8L12 21l-2.8-6.2L3 12l6.2-2.8z"/>',
+    print:'<path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6z"/><path d="M17 11h.1"/>'
+  };
+  const icon=(name,extra='')=>`<svg aria-hidden="true" class="icon ${extra}" viewBox="0 0 24 24">${ICONS[name]||ICONS.book}</svg>`;
+  const $=(q,base=document)=>base.querySelector(q);
+  let state=C.blank(), persistedRaw=null, corruptRaw=null, storageIssue=false;
+  let firstRun=true;
+  try {
+    persistedRaw=localStorage.getItem(KEY);
+    if(persistedRaw){try{state=C.validateState(JSON.parse(persistedRaw));firstRun=false;}catch{corruptRaw=persistedRaw;firstRun=false;}}
+    localStorage.setItem('studytrack_storage_test','1');localStorage.removeItem('studytrack_storage_test');
+  } catch {storageIssue=true;}
+  const ui={view:'overview',week:C.weekStart(new Date()),filters:{query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'},formVersion:0};
+  const navItems=[['overview','grid','Overview'],['tasks','tasks','All tasks'],['week','calendar','Weekly planner'],['subjects','subjects','Subjects'],['help','settings','Data & help']];
+  const initialHash=location.hash.slice(1);if(navItems.some(n=>n[0]===initialHash))ui.view=initialHash;
+  const statusLabel={todo:'To do',progress:'In progress',done:'Completed'};
+  const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+  const subjectOf=id=>state.subjects.find(s=>s.id===id)||{id:null,code:'General',name:'General',color:'slate'};
+  const fmtDate=(d,opts={month:'short',day:'numeric'})=>new Intl.DateTimeFormat('en-PH',opts).format(d);
+  const fmtTime=d=>new Intl.DateTimeFormat('en-PH',{hour:'numeric',minute:'2-digit'}).format(d);
+  const smallDate=value=>fmtDate(C.parseLocal(value));
+  const initials=()=>state.profile.name?state.profile.name.trim().split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase():'ST';
+  let lastConfirm=null;
+  let downloadUrls=[];
+
+  function shell(){
+    $('#app').innerHTML=`
+      <a class="skip" href="#main">Skip to planner</a>
+      <aside class="sidebar" aria-label="StudyTrack navigation">
+        <button class="brand" data-view="overview" aria-label="StudyTrack overview"><span class="brand-mark">${icon('book')}</span>StudyTrack</button>
+        <div class="brand-sub">LESS CHAOS. MORE CLARITY.</div><div class="nav-title">WORKSPACE</div>
+        <nav class="nav" aria-label="Main navigation">${navItems.map(([view,ico,label])=>`<button class="nav-btn" data-view="${view}">${icon(ico)}<span>${label}</span>${view==='tasks'?'<span class="count" id="navTaskCount">0</span>':''}</button>`).join('')}</nav>
+        <div class="sidebar-bottom"><div class="side-note">${icon('shield')}<strong>Your planner, on this device.</strong><p>No account needed. Export a backup to keep your work safe.</p></div><div class="side-version"><span class="local-dot"></span>LOCAL MVP <span style="float:right">v0.1</span></div></div>
+      </aside>
+      <div class="app-shell"><header class="topbar"><div class="breadcrumbs">My workspace<span>/</span><strong id="crumb">Overview</strong></div>
+        <button class="brand mobile-brand" data-view="overview" aria-label="StudyTrack overview"><span class="brand-mark">${icon('book')}</span>StudyTrack</button>
+        <div class="top-actions"><span class="date-label">${icon('calendar')}<span id="headerDate"></span></span><button class="icon-btn" data-act="export" aria-label="Export backup" title="Export backup">${icon('download')}</button><button class="avatar" data-view="help" aria-label="Profile and data settings" id="avatar">ST</button></div>
+      </header><main id="main" tabindex="-1"><div id="banners"></div><div id="view"></div><footer class="footer-note"><span>StudyTrack · A NEUST student project concept. Not an official university app.</span><button data-view="help">Stored locally · About this MVP</button></footer></main></div>
+      <nav class="mobile-nav" aria-label="Mobile navigation">${navItems.map(([view,ico,label])=>`<button data-view="${view}" aria-label="${label}">${icon(ico)}<span>${({overview:'Overview',tasks:'Tasks',week:'Week',subjects:'Subjects',help:'Data & help'})[view]}</span></button>`).join('')}</nav>
+      <dialog id="modal" aria-labelledby="modalTitle"><div id="modalContent"></div></dialog>
+      <dialog id="confirmDialog" aria-labelledby="confirmTitle"><div class="dialog-head"><div><h2 id="confirmTitle"></h2></div><button class="icon-btn" data-act="confirm-no" aria-label="Cancel">${icon('x')}</button></div><div class="dialog-body"><p id="confirmText" class="confirm-text"></p><div class="form-actions"><button class="button secondary" data-act="confirm-no">Cancel</button><button class="button primary" data-act="confirm-yes" id="confirmYes">Continue</button></div></div></dialog>
+      <div class="toast-area" id="toasts" aria-live="polite" aria-atomic="false"></div><input type="file" id="importFile" accept=".json,application/json" hidden>
+    `;
+    $('#confirmDialog').addEventListener('cancel',()=>{lastConfirm?.(false);lastConfirm=null;});
+  }
+  function toast(message,error=false,undo=null){
+    const item=document.createElement('div');item.className=`toast${error?' error':''}`;
+    item.innerHTML=`${icon(error?'alert':'checkCircle')}<span></span>`;item.querySelector('span').textContent=message;
+    if(undo){const b=document.createElement('button');b.textContent='Undo';b.onclick=()=>{undo();item.remove();};item.append(b);}
+    const close=document.createElement('button');close.innerHTML=icon('x');close.setAttribute('aria-label','Dismiss message');close.onclick=()=>item.remove();item.append(close);
+    const area=$('#toasts');while(area.children.length>=2)area.firstElementChild.remove();
+    area.append(item);setTimeout(()=>item.remove(),error?14000:6500);
+  }
+  function ask(title,message,label='Continue',danger=false){
+    $('#confirmTitle').textContent=title;$('#confirmText').textContent=message;$('#confirmYes').textContent=label;$('#confirmYes').className=`button ${danger?'danger':'primary'}`;
+    $('#confirmDialog').showModal();
+    return new Promise(resolve=>{lastConfirm=resolve;});
+  }
+  function answerConfirm(value){$('#confirmDialog').close();lastConfirm?.(value);lastConfirm=null;}
+  function storageBanners(){
+    const out=[];
+    if(corruptRaw)out.push(`<div class="notice warning"><p>${icon('alert')}Saved data could not be read. It has not been overwritten. Open Data & help to recover it.</p><button class="text-button" data-view="help">Data & help</button></div>`);
+    else if(storageIssue)out.push(`<div class="notice warning"><p>${icon('alert')}Browser storage is unavailable or full. Changes are in memory only. Export before closing.</p><button class="text-button" data-act="export">Export backup</button></div>`);
+    if(state.mode==='sample')out.push(`<div class="notice"><p>${icon('spark')}You’re exploring sample data. These tasks and subject codes are fictional.</p><button class="text-button" data-act="fresh">Start my planner ${icon('arrow')}</button></div>`);
+    $('#banners').innerHTML=out.join('');
+  }
+  function commit(candidate,{force=false,expected=null}={}){
+    if(corruptRaw&&!force){toast('Recover or reset the unreadable backup in Data & help before saving.',true);return false;}
+    if(expected!==null&&expected!==state.updatedAt){toast('The planner changed. Close and reopen this form before saving.',true);return false;}
+    try{
+      const current=localStorage.getItem(KEY);
+      if(!force&&current!==persistedRaw){
+        try{state=current?C.validateState(JSON.parse(current)):C.blank();persistedRaw=current;render();}
+        catch{corruptRaw=current;storageBanners();}
+        toast('Another tab changed this planner. Close and reopen the form so you do not overwrite newer work.',true);return false;
+      }
+    }catch{storageIssue=true;}
+    let next;
+    try{next=C.validateState(candidate);}catch(err){toast(err.message,true);return false;}
+    next.updatedAt=Math.max(Date.now(),state.updatedAt+1);
+    state=next;
+    const encoded=JSON.stringify(state);
+    try{localStorage.setItem(KEY,encoded);persistedRaw=encoded;storageIssue=false;corruptRaw=null;}
+    catch{storageIssue=true;if(force)corruptRaw=null;}
+    render();return true;
+  }
+  function mutate(fn,opts={}){const next=JSON.parse(JSON.stringify(state));fn(next);return commit(next,opts);}
+  function setView(view){if(!navItems.some(n=>n[0]===view))return;ui.view=view;try{history.replaceState(null,'',`#${view}`);}catch{}render();window.scrollTo({top:0,behavior:'instant'});}
+  function goTasks(period='all',subject='all'){ui.filters={query:'',subject,priority:'all',status:period==='completed'?'done':'all',period:period==='completed'?'all':period,sort:'deadline'};setView('tasks');}
+  function heading(eyebrow,title,subtitle,button=''){return `<div class="page-heading"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p class="subheading">${subtitle}</p></div>${button}</div>`;}
+  const addTaskButton=()=>`<button class="button primary" data-act="add-task">${icon('plus')}Add task</button>`;
+  function render(){
+    for(const b of document.querySelectorAll('[data-view]')){const active=b.dataset.view===ui.view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}
+    $('#crumb').textContent=navItems.find(n=>n[0]===ui.view)[2];$('#avatar').textContent=initials();$('#headerDate').textContent=fmtDate(new Date(),{weekday:'short',month:'short',day:'numeric',year:'numeric'});$('#navTaskCount').textContent=C.stats(state).open;
+    storageBanners();
+    const renderers={overview:renderOverview,tasks:renderTasks,week:renderWeek,subjects:renderSubjects,help:renderHelp};
+    $('#view').innerHTML=renderers[ui.view]();
+    if(ui.view==='tasks')updateTaskResults();
+  }
+  function dueDisplay(task){
+    const now=new Date(),d=C.parseLocal(task.dueAt),day=task.dueAt.slice(0,10),today=C.dateKey(now),tomorrow=C.dateKey(C.addDays(now,1));
+    let label=day===today?'Today':day===tomorrow?'Tomorrow':fmtDate(d,{month:'short',day:'numeric'});
+    const overdue=C.isOverdue(task,now);if(overdue)label=day===today?'Overdue today':`Overdue · ${fmtDate(d)}`;
+    return `<div class="task-due ${overdue?'overdue':day===today?'today':''}"><strong>${label}</strong><span>${fmtTime(d)}</span></div>`;
+  }
+  function taskRow(t,full=false){
+    const subject=subjectOf(t.subjectId);
+    return `<div class="task-row ${t.status==='done'?'is-done':''}" data-task-id="${t.id}">
+      <button class="task-check ${t.status==='done'?'done':''}" data-act="toggle-task" data-id="${t.id}" aria-label="${t.status==='done'?'Reopen':'Complete'} ${E(t.title)}" aria-pressed="${t.status==='done'}">${t.status==='done'?icon('check'):''}</button>
+      <button class="task-body" data-act="edit-task" data-id="${t.id}" aria-label="Edit ${E(t.title)}"><span class="task-title">${E(t.title)}</span><span class="task-meta"><span class="subject-label color-${subject.color}"><span class="dot"></span><span class="subject-code">${E(subject.code||subject.name)}</span></span><span>·</span><span>${E(t.type)}</span>${t.status==='progress'&&!full?'<span class="status-inline">· In progress</span>':''}</span></button>
+      ${dueDisplay(t)}<span class="badge ${t.priority}">${cap(t.priority)}</span>
+      ${full?`<span class="task-status-col"><span class="badge ${t.status}">${statusLabel[t.status]}</span></span><div class="row-actions"><button class="icon-btn" data-act="edit-task" data-id="${t.id}" aria-label="Open task details: ${E(t.title)}">${icon('edit')}</button><button class="icon-btn" data-act="delete-task" data-id="${t.id}" aria-label="Delete ${E(t.title)}">${icon('trash')}</button></div>`:''}
+    </div>`;
+  }
+  function empty(title,description,action='',ico='tasks'){return `<div class="empty"><div class="empty-symbol">${icon(ico)}</div><h3>${title}</h3><p>${description}</p>${action}</div>`;}
+  function renderOverview(){
+    const now=new Date(),st=C.stats(state,now),next=C.sortTasks(state.tasks.filter(t=>t.status!=='done')).slice(0,5),week=C.weekStart(now);
+    const counts=Array.from({length:7},(_,i)=>state.tasks.filter(t=>t.status!=='done'&&t.dueAt.startsWith(C.dateKey(C.addDays(week,i)))).length);
+    const max=Math.max(...counts,1);
+    const displayName=state.profile.name?`${E(state.profile.name)}, your day in focus.`:'Your day, in focus.';
+    return `${heading('YOUR PERSONAL STUDY SPACE',displayName,'One place for your deadlines. A clearer plan for what’s next.',addTaskButton())}
+      <section class="hero" aria-label="Planner summary"><div class="hero-copy"><h2>A little structure.<br>A lot more headspace.</h2><p>Break the big workload into small, manageable steps.<br>Your next step starts here.</p><button class="text-button" data-view="week">Plan your week ${icon('arrow')}</button></div><div class="hero-art" aria-hidden="true"><div class="hero-card"><div class="hero-card-top">One task at a time<span class="small-check">${icon('check')}</span></div><strong>${st.percent}%</strong><div class="bar"><span style="width:${st.percent}%"></span></div><p>${st.completed} of ${st.total} tasks completed</p></div></div></section>
+      <div class="metrics">
+        ${metric('Due today',st.today,'Unfinished tasks due today','clock','', 'today')}
+        ${metric('Overdue',st.overdue,'Deadlines already passed','alert','rose','overdue')}
+        ${metric('Next 7 days',st.upcoming,'From now through day seven','calendar','amber','upcoming')}
+        ${metric('Completed',st.completed,'Tasks you have checked off','checkCircle','teal','completed')}
+      </div>
+      <div class="overview-grid"><div class="column-stack"><section class="panel overview-tasks"><div class="panel-head"><div><h2>Up next</h2><p class="panel-sub">Your closest deadlines, overdue tasks first.</p></div><button class="text-button" data-act="show-tasks">View all ${icon('arrow')}</button></div>
+        ${next.length?`<div class="table-head"><span>Task / subject</span><span>Deadline</span><span>Priority</span></div>${next.map(t=>taskRow(t)).join('')}<div class="panel-foot">${icon('checkCircle')} Check off a task when it’s done. Select its title to edit.</div>`:empty(st.total?'All caught up. Nicely done!':'Your first task starts here.',st.total?'Plan a study session or add your next requirement.':'Add an assignment, select a deadline, and take it one step at a time.',addTaskButton())}
+      </section><section class="panel"><div class="panel-head"><div><h2>Your subjects</h2><p class="panel-sub">A small view of the bigger picture.</p></div><button class="text-button" data-view="subjects">Manage ${icon('arrow')}</button></div>
+        ${state.subjects.length?state.subjects.slice(0,4).map(s=>{const ts=state.tasks.filter(t=>t.subjectId===s.id),done=ts.filter(t=>t.status==='done').length;return `<button class="subject-mini color-${s.color}" style="width:100%;text-align:left" data-act="subject-tasks" data-id="${s.id}"><span class="subject-symbol">${E((s.code||s.name).slice(0,2))}</span><span class="subject-mini-info"><span class="subject-mini-name" style="display:block">${E(s.name)}</span><span class="bar"><span style="width:${ts.length?Math.round(done/ts.length*100):0}%"></span></span></span><span class="mini-count">${done}/${ts.length} done</span></button>`;}).join(''):empty('Make room for your subjects.','Group your work by course so nothing gets scattered.',`<button class="button soft small" data-act="add-subject">${icon('plus')}Add subject</button>`,'subjects')}
+      </section></div><div class="column-stack"><section class="panel"><div class="panel-head"><div><h2>This week at a glance</h2><p class="panel-sub">${fmtDate(week)} – ${fmtDate(C.addDays(week,6))}</p></div><span class="badge neutral">${counts.reduce((a,b)=>a+b,0)} open</span></div>
+        <div class="week-chart" role="img" aria-label="Open deadlines by day: ${counts.map((n,i)=>`${fmtDate(C.addDays(week,i),{weekday:'long'})} ${n}`).join(', ')}">${counts.map((n,i)=>{const d=C.addDays(week,i);return `<div class="chart-day ${C.dateKey(d)===C.dateKey(now)?'today':''}"><span class="chart-value">${n||''}</span><div class="chart-bar" style="--height:${Math.round(n/max*70)||4}"></div><span>${fmtDate(d,{weekday:'short'}).slice(0,1)}</span></div>`;}).join('')}</div><p class="chart-caption">Unfinished task deadlines, not time spent studying.</p></section>
+        <section class="panel next-step panel-pad"><div class="eyebrow">${icon('spark')} SMALL STEPS COUNT</div><h3>${next.length?'Pick one task. Give it a little time.':'Make a little space to study.'}</h3><p>${next.length?`Start with “${E(next[0].title)}”. Add a study block to make space for it.`:'Set aside a short session for a subject you want to review.'}</p><button class="button small" data-act="plan-next" ${next.length?`data-id="${next[0].id}"`:''}>${icon('plus')}Plan a study block</button></section>
+        <section class="panel panel-pad"><h3>A gentle reminder</h3><p class="panel-sub" style="line-height:1.8;margin-bottom:13px">This is a place to organize your work, not measure your worth. Start with what matters most today.</p><button class="text-button" data-act="show-tasks" data-period="today">See today’s tasks ${icon('arrow')}</button></section></div></div>`;
+  }
+  function metric(label,value,foot,ico,color,period){return `<button class="metric" data-act="show-tasks" data-period="${period}" style="text-align:left"><span class="metric-top">${label}<span class="metric-icon ${color}">${icon(ico)}</span></span><span class="metric-value" style="display:block">${value}</span><span class="metric-foot">${foot}</span></button>`;}
+  function renderTasks(){
+    const f=ui.filters;
+    return `${heading('MAKE THE NEXT STEP CLEAR','All your tasks. One place.','Keep assignments, quizzes, and projects out of your head.',addTaskButton())}
+      <div class="toolbar"><label class="search-field"><span class="sr-only">Search tasks</span>${icon('search')}<input id="taskSearch" type="search" placeholder="Search tasks or notes…" value="${E(f.query)}" maxlength="140" autocomplete="off"></label>
+        <select class="control" aria-label="Filter by subject" data-filter="subject"><option value="all">All subjects</option><option value="general" ${f.subject==='general'?'selected':''}>General</option>${state.subjects.map(s=>`<option value="${s.id}" ${f.subject===s.id?'selected':''}>${E(s.code||s.name)}</option>`).join('')}</select>
+        <select class="control" aria-label="Filter by priority" data-filter="priority"><option value="all">All priorities</option>${C.PRIORITY.map(p=>`<option value="${p}" ${f.priority===p?'selected':''}>${cap(p)} priority</option>`).join('')}</select>
+        <select class="control" aria-label="Filter by deadline" data-filter="period">${[['all','All deadlines'],['today','Due today'],['overdue','Overdue'],['upcoming','Next 7 days']].map(([v,l])=>`<option value="${v}" ${f.period===v?'selected':''}>${l}</option>`).join('')}</select>
+        <select class="control" aria-label="Sort tasks" data-filter="sort"><option value="deadline" ${f.sort==='deadline'?'selected':''}>Deadline first</option><option value="priority" ${f.sort==='priority'?'selected':''}>Priority first</option></select></div>
+      <div class="tabs" role="group" aria-label="Task status">${[['all','All tasks'],['todo','To do'],['progress','In progress'],['done','Completed']].map(([v,l])=>`<button class="tab ${f.status===v?'active':''}" data-act="task-tab" data-status="${v}" aria-pressed="${f.status===v}">${l}<span class="tab-count">${v==='all'?state.tasks.length:state.tasks.filter(t=>t.status===v).length}</span></button>`).join('')}</div>
+      <section class="panel tasks-list" id="taskResults" aria-label="Task results"></section><div class="list-summary"><span id="resultCount"></span><button class="text-button" data-act="clear-filters">Clear filters</button></div>`;
+  }
+  function updateTaskResults(){
+    if(ui.view!=='tasks'||!$('#taskResults'))return;
+    const f=ui.filters,now=new Date(),end=C.addDays(C.startDay(now),7),q=f.query.trim().toLowerCase();
+    const rows=C.sortTasks(state.tasks.filter(t=>{
+      if(f.status!=='all'&&t.status!==f.status)return false;
+      if(f.subject==='general'&&t.subjectId!==null)return false;
+      if(f.subject!=='all'&&f.subject!=='general'&&t.subjectId!==f.subject)return false;
+      if(f.priority!=='all'&&t.priority!==f.priority)return false;
+      if(q&&!`${t.title} ${t.notes} ${subjectOf(t.subjectId).name} ${subjectOf(t.subjectId).code}`.toLowerCase().includes(q))return false;
+      if(f.period==='today'&&(t.status==='done'||t.dueAt.slice(0,10)!==C.dateKey(now)))return false;
+      if(f.period==='overdue'&&!C.isOverdue(t,now))return false;
+      if(f.period==='upcoming'&&(t.status==='done'||C.parseLocal(t.dueAt)<now||C.parseLocal(t.dueAt)>=end))return false;
+      return true;
+    }),f.sort);
+    $('#taskResults').innerHTML=rows.length?rows.map(t=>taskRow(t,true)).join(''):empty(state.tasks.length?'No tasks match those filters.':'A clear planner starts with one task.',state.tasks.length?'Try another subject or clear the filters.':'Add your first assignment or load the sample planner from Data & help.',state.tasks.length?'<button class="button soft small" data-act="clear-filters">Clear filters</button>':addTaskButton());
+    $('#resultCount').textContent=`Showing ${rows.length} of ${state.tasks.length} tasks`;
+    for(const btn of document.querySelectorAll('[data-act="task-tab"]')){const active=btn.dataset.status===f.status;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
+  }
+  function renderSubjects(){
+    return `${heading('EVERY SUBJECT HAS ITS SPACE','Keep your courses together.','Add your subjects, then organize the tasks that belong to them.',`<button class="button primary" data-act="add-subject">${icon('plus')}Add subject</button>`)}
+      ${state.subjects.length?`<div class="subjects-grid">${state.subjects.map(s=>{const ts=state.tasks.filter(t=>t.subjectId===s.id),done=ts.filter(t=>t.status==='done').length;return `<section class="panel subject-card color-${s.color}"><div class="subject-card-top"><span class="subject-symbol">${E((s.code||s.name).slice(0,2))}</span><div><button class="icon-btn" data-act="edit-subject" data-id="${s.id}" aria-label="Edit subject ${E(s.name)}">${icon('edit')}</button><button class="icon-btn" data-act="delete-subject" data-id="${s.id}" aria-label="Delete subject ${E(s.name)}">${icon('trash')}</button></div></div><p class="eyebrow" style="color:var(--accent);margin-bottom:4px">${E(s.code||'SUBJECT')}</p><h3>${E(s.name)}</h3><div class="bar"><span style="width:${ts.length?Math.round(done/ts.length*100):0}%"></span></div><div class="subject-card-bottom"><span>${done}/${ts.length} completed</span><button class="text-button" data-act="subject-tasks" data-id="${s.id}">View tasks ${icon('arrow')}</button></div></section>`;}).join('')}</div>`:`<section class="panel">${empty('Your subjects belong here.','Add a course name and a color to give your requirements a home.',`<button class="button primary" data-act="add-subject">${icon('plus')}Add your first subject</button>`,'subjects')}</section>`}
+      <p class="week-note">Tasks without a subject stay under General. Deleting a subject moves its tasks and study blocks to General; it does not delete them.</p>`;
+  }
+  function renderWeek(){
+    const week=ui.week,now=new Date();
+    return `${heading('MAKE SPACE FOR STUDY TIME','A plan for the week ahead.','See your deadlines alongside the study blocks you choose.',`<button class="button primary" data-act="add-session">${icon('plus')}Study block</button>`)}
+      <div class="week-top"><div class="week-controls"><button class="icon-btn" data-act="previous-week" aria-label="Previous week">${icon('left')}</button><button class="button secondary small" data-act="current-week">This week</button><button class="icon-btn" data-act="next-week" aria-label="Next week">${icon('right')}</button><span class="week-range">${fmtDate(week)} – ${fmtDate(C.addDays(week,6),{month:'short',day:'numeric',year:'numeric'})}</span></div><div class="week-legend"><span><i class="legend-square"></i>Task deadline</span><span><i class="legend-square session"></i>Study block</span><button class="icon-btn" data-act="print" aria-label="Print weekly planner">${icon('print')}</button></div></div>
+      <div class="week-scroll" tabindex="0" role="region" aria-label="Seven-day planner. Scroll horizontally on small screens."><div class="week-grid">${Array.from({length:7},(_,i)=>{
+        const d=C.addDays(week,i),key=C.dateKey(d),today=key===C.dateKey(now);
+        const ts=state.tasks.filter(t=>t.dueAt.startsWith(key)).map(t=>({kind:'task',at:t.dueAt,item:t}));
+        const ss=state.sessions.filter(s=>s.startAt.startsWith(key)).map(s=>({kind:'session',at:s.startAt,item:s}));
+        const events=[...ts,...ss].sort((a,b)=>a.at.localeCompare(b.at));
+        return `<section class="day-col ${today?'is-today':''}" aria-label="${fmtDate(d,{weekday:'long',month:'long',day:'numeric'})}"><header class="day-head"><div><small>${fmtDate(d,{weekday:'short'}).toUpperCase()}</small><span class="day-number">${d.getDate()}</span></div><button class="icon-btn" data-act="add-session" data-day="${key}" aria-label="Add study block on ${fmtDate(d)}">${icon('plus')}</button></header>
+          ${events.length?events.map(ev=>{const t=ev.item,s=subjectOf(t.subjectId),done=ev.kind==='task'?t.status==='done':t.done;return `<button class="day-card color-${s.color} ${ev.kind==='session'?'session':''} ${done?'is-done':''}" data-act="edit-${ev.kind}" data-id="${t.id}" aria-label="Edit ${ev.kind==='task'?'task':'study block'}: ${E(t.title)}"><span class="day-kind">${ev.kind==='task'?'DEADLINE':'STUDY BLOCK'}${done?' · DONE':''}</span><strong>${E(t.title)}</strong><small>${fmtTime(C.parseLocal(ev.at))}${ev.kind==='session'?` · ${t.durationMinutes} min`:''}</small><small>${E(s.code||s.name)}</small></button>`;}).join(''):'<div class="day-empty">A little breathing room.</div>'}
+        </section>`;
+      }).join('')}</div></div><p class="week-note">Study blocks are manually planned, not AI-generated. All times follow this device’s local clock. On mobile, swipe the planner sideways.</p>`;
+  }
+  function renderHelp(){
+    return `${heading('YOUR SPACE. YOUR DATA.','A small app, with clear boundaries.','Manage your display name, backups, and sample planner.')}
+      <div class="settings-grid"><section class="panel panel-pad"><h3>Make it yours</h3><p>A display name personalizes this browser. It is not a user account.</p><form id="profileForm"><div class="field"><label for="profileName">Display name (optional)</label><input id="profileName" name="name" value="${E(state.profile.name)}" maxlength="40" placeholder="Your first name" autocomplete="off"></div><button class="button primary" type="submit">Save name</button></form><div class="help-note">Only use non-sensitive academic information. Anyone with access to this browser profile can open the planner.</div></section>
+      <section class="panel panel-pad"><h3>Keep a copy of your work</h3><p>Export a JSON backup before clearing browser data, changing devices, or replacing this file. Import restores a backup by replacing the current planner.</p><button class="button secondary" data-act="export">${icon('download')}Export backup</button><button class="button secondary" data-act="import">${icon('upload')}Import backup</button>${corruptRaw?'<p><strong>Unreadable saved data found.</strong></p><button class="button danger" data-act="recover">Download unreadable data</button>':''}<div class="help-note">Opened as a local HTML file? Browser saving can vary. Keep the file in the same place and use backups, or run the included local server. Moving the file or switching to a server uses a different storage location.</div></section>
+      <section class="panel panel-pad"><h3>What this MVP does</h3><ul><li>Add, edit, delete, and complete tasks.</li><li>Organize subjects, deadlines, priority, and notes.</li><li>Filter tasks and see a seven-day planner.</li><li>Schedule study blocks and track task completion.</li><li>Show in-app overdue and upcoming deadline indicators.</li><li>Save in this browser when storage is available, and export/import backups.</li></ul><p class="help-note">No login, cloud sync, team sharing, AI scheduling, school-portal integration, or background/push reminders. The app does not submit schoolwork or reduce the work assigned.</p></section>
+      <section class="panel panel-pad"><h3>Try a classroom walkthrough</h3><ol><li>Add a subject, such as Engineering Economy.</li><li>Add an assignment, due date, and priority.</li><li>Open Weekly planner and schedule a study block.</li><li>Mark the assignment complete and check Overview.</li><li>Export your data, reload the app, and check your work.</li></ol><p>Keyboard shortcut: <span class="kbd">N</span> adds a task when you are not typing. <span class="kbd">Esc</span> closes a dialog.</p><button class="button secondary" data-act="sample">${icon('spark')}Load sample planner</button></section>
+      <section class="panel panel-pad"><h3>Why StudyTrack?</h3><p>Your supplied survey summary records 35 selections for heavy academic workload / overlapping deadlines, 30 for time-management problems, and 18 votes for a Student Planner / Digital Study Organizer App.</p><p>This MVP tests the proposed workflow. It does not prove an improvement in grades, reduced stress, or willingness to pay.</p><p class="small-label">Sources: <em>Quiz2_Customers_Segmentation_and_Needs-1 (1).pdf</em>, pp. 2–3; <em>TECHNO MODULE 2 - 6.pdf</em>, printed p. 16 (MVP definition). These are the group’s supplied materials, not new research.</p></section>
+      <section class="panel panel-pad"><h3>Reset this planner</h3><p>Start with an empty planner. This removes tasks, subjects, and study blocks from this app’s storage only. Export first to keep a copy.</p><button class="button danger" data-act="fresh">${icon('trash')}Start fresh</button><p class="help-note">Single-user prototype · v0.1.0<br>Dates and times use the device’s current timezone. There is no server, tracking code, or external request in this app.</p></section></div>`;
+  }
+  function modalHead(title,subtitle){return `<div class="dialog-head"><div><h2 id="modalTitle">${title}</h2><p>${subtitle}</p></div><button class="icon-btn" data-act="close-modal" aria-label="Close dialog">${icon('x')}</button></div>`;}
+  function openModal(html,kind=''){ui.formVersion=state.updatedAt;$('#modalContent').innerHTML=html;$('#modal').className=kind;if(!$('#modal').open)$('#modal').showModal();}
+  function closeModal(){$('#modal').close();}
+  function subjectOptions(selected){return `<option value="" ${selected===null?'selected':''}>General (no subject)</option>${state.subjects.map(s=>`<option value="${s.id}" ${s.id===selected?'selected':''}>${E(s.code?`${s.code} · ${s.name}`:s.name)}</option>`).join('')}`;}
+  function formError(message){const el=$('#formError');if(el){el.textContent=message;el.hidden=false;}else toast(message,true);}
+  function clearFormError(){const el=$('#formError');if(el)el.hidden=true;}
+  function openTask(id=null){
+    const existing=id?state.tasks.find(t=>t.id===id):null;if(id&&!existing)return;
+    const day=C.dateKey(new Date());
+    const t=existing||{id:'',title:'',subjectId:ui.view==='tasks'&&state.subjects.some(s=>s.id===ui.filters.subject)?ui.filters.subject:null,type:'Assignment',priority:'medium',status:'todo',dueAt:`${day}T23:59`,effortMinutes:0,notes:''};
+    openModal(`${modalHead(existing?'Edit your task':'One task closer to clarity.','Add a requirement and give it a clear deadline.')}<div class="dialog-body"><form id="taskForm" data-id="${t.id}"><div class="form-grid">
+      <div class="field full"><label for="taskTitle">Task title *</label><input id="taskTitle" name="title" required maxlength="140" value="${E(t.title)}" placeholder="e.g. Annuity practice exercises" autofocus></div>
+      <div class="field full"><label for="taskSubject">Subject</label><select id="taskSubject" name="subjectId">${subjectOptions(t.subjectId)}</select></div>
+      <div class="field"><label for="taskDate">Due date *</label><input id="taskDate" name="date" type="date" min="1900-01-01" max="2200-12-31" required value="${t.dueAt.slice(0,10)}"></div>
+      <div class="field"><label for="taskTime">Due time *</label><input id="taskTime" name="time" type="time" required value="${t.dueAt.slice(11,16)}"></div>
+      <div class="field"><label for="taskPriority">Priority</label><select id="taskPriority" name="priority">${C.PRIORITY.map(p=>`<option value="${p}" ${p===t.priority?'selected':''}>${cap(p)}</option>`).join('')}</select></div>
+      <div class="field"><label for="taskType">Requirement type</label><select id="taskType" name="type">${C.TYPES.map(v=>`<option ${v===t.type?'selected':''}>${v}</option>`).join('')}</select></div>
+      <div class="field"><label for="taskStatus">Status</label><select id="taskStatus" name="status">${C.STATUS.map(s=>`<option value="${s}" ${s===t.status?'selected':''}>${statusLabel[s]}</option>`).join('')}</select></div>
+      <div class="field"><label for="taskEffort">Estimated minutes (optional)</label><input id="taskEffort" name="effort" type="number" min="0" max="1440" step="1" placeholder="e.g. 45" value="${t.effortMinutes||''}"></div>
+      <div class="field full"><label for="taskNotes">Notes (optional)</label><textarea id="taskNotes" name="notes" maxlength="4000" placeholder="Instructions, things to remember…">${E(t.notes)}</textarea><small>Times use this device’s local clock. Deadline indicators appear inside the app only.</small></div></div><p id="formError" class="error-message" role="alert" hidden></p>
+      <div class="form-actions">${existing?`<button type="button" class="icon-btn delete-action" data-act="delete-task" data-id="${t.id}" aria-label="Delete this task">${icon('trash')}</button>`:''}<button type="button" class="button secondary" data-act="close-modal">Cancel</button><button type="submit" class="button primary">${existing?'Save changes':'Add task'}</button></div></form></div>`);
+  }
+  function saveTask(form){
+    clearFormError();if(!form.reportValidity())return;const f=new FormData(form),id=form.dataset.id,title=String(f.get('title')).trim(),dueAt=`${f.get('date')}T${f.get('time')}`;
+    if(!title)return formError('Please enter a task title, not just spaces.');if(!C.parseLocal(dueAt))return formError('Enter a valid local date and time.');
+    const effort=Number(f.get('effort')||0);if(!Number.isInteger(effort)||effort<0||effort>1440)return formError('Estimated minutes must be a whole number from 0 to 1440.');
+    const old=state.tasks.find(t=>t.id===id),now=new Date().toISOString(),status=String(f.get('status'));
+    const record={id:id||C.uid('task'),title,subjectId:f.get('subjectId')||null,dueAt,priority:String(f.get('priority')),type:String(f.get('type')),status,effortMinutes:effort,notes:String(f.get('notes')).trim(),createdAt:old?.createdAt||now,completedAt:status==='done'?(old?.completedAt||now):null};
+    if(mutate(s=>{if(old)s.tasks=s.tasks.map(t=>t.id===id?record:t);else s.tasks.push(record);},{expected:ui.formVersion})){closeModal();toast(old?'Task updated.':'Task added to your planner.');}
+  }
+  function openSubject(id=null){
+    const s=id?state.subjects.find(x=>x.id===id):{id:'',name:'',code:'',color:C.COLORS[state.subjects.length%C.COLORS.length]};if(!s)return;
+    openModal(`${modalHead(id?'Edit subject':'Give your subject a home.','Choose a name, a short code, and a color.')}<div class="dialog-body"><form id="subjectForm" data-id="${s.id}"><div class="form-grid"><div class="field full"><label for="subjectName">Subject name *</label><input id="subjectName" name="name" required maxlength="90" value="${E(s.name)}" placeholder="e.g. Engineering Economy" autofocus></div><div class="field full"><label for="subjectCode">Short code (optional)</label><input id="subjectCode" name="code" maxlength="20" value="${E(s.code)}" placeholder="e.g. ECON 313"></div><fieldset class="field full" style="border:0;padding:0;margin:0"><legend class="field-label">Color</legend><div class="swatches">${C.COLORS.map(color=>`<label class="swatch-label color-${color}"><input type="radio" name="color" value="${color}" aria-label="${cap(color)}" ${s.color===color?'checked':''}><span class="swatch-circle"></span></label>`).join('')}</div></fieldset></div><p id="formError" class="error-message" role="alert" hidden></p><div class="form-actions"><button class="button secondary" type="button" data-act="close-modal">Cancel</button><button class="button primary" type="submit">${id?'Save subject':'Add subject'}</button></div></form></div>`);
+  }
+  function saveSubject(form){
+    clearFormError();if(!form.reportValidity())return;const f=new FormData(form),id=form.dataset.id,name=String(f.get('name')).trim(),code=String(f.get('code')).trim();
+    if(!name)return formError('Please enter a subject name, not just spaces.');
+    if(state.subjects.some(s=>s.id!==id&&s.name.toLowerCase()===name.toLowerCase()))return formError('That subject already exists. Choose another name.');
+    const record={id:id||C.uid('subject'),name,code,color:String(f.get('color'))};
+    if(mutate(s=>{if(id)s.subjects=s.subjects.map(x=>x.id===id?record:x);else s.subjects.push(record);},{expected:ui.formVersion})){closeModal();toast(id?'Subject updated.':'Subject added.');}
+  }
+  function openSession(id=null,day=null,task=null){
+    const now=new Date(),value=day?`${day}T18:00`:`${C.dateKey(now)}T18:00`;
+    const s=id?state.sessions.find(s=>s.id===id):{id:'',title:task?`Study: ${task.title}`.slice(0,140):'',subjectId:task?.subjectId||null,startAt:value,durationMinutes:task?.effortMinutes?Math.max(5,Math.min(task.effortMinutes,480)):45,notes:'',done:false};if(!s)return;
+    openModal(`${modalHead(id?'Edit study block':'Make a little time for study.','A manual plan for when you want to work.')}<div class="dialog-body"><form id="sessionForm" data-id="${s.id}"><div class="form-grid"><div class="field full"><label for="sessionTitle">Study block title *</label><input id="sessionTitle" name="title" required maxlength="140" value="${E(s.title)}" placeholder="e.g. Practice annuity problems" autofocus></div><div class="field full"><label for="sessionSubject">Subject</label><select id="sessionSubject" name="subjectId">${subjectOptions(s.subjectId)}</select></div><div class="field"><label for="sessionDate">Study date *</label><input id="sessionDate" name="date" type="date" min="1900-01-01" max="2200-12-31" required value="${s.startAt.slice(0,10)}"></div><div class="field"><label for="sessionTime">Start time *</label><input id="sessionTime" name="time" type="time" required value="${s.startAt.slice(11)}"></div><div class="field"><label for="sessionDuration">Duration in minutes *</label><input id="sessionDuration" name="duration" type="number" required min="5" max="480" step="1" value="${s.durationMinutes}"></div><div class="field"><label for="sessionStatus">Session status</label><select id="sessionStatus" name="done"><option value="no" ${!s.done?'selected':''}>Planned</option><option value="yes" ${s.done?'selected':''}>Completed</option></select></div><div class="field full"><label for="sessionNotes">Notes (optional)</label><textarea id="sessionNotes" name="notes" maxlength="4000">${E(s.notes)}</textarea></div></div><p id="formError" class="error-message" role="alert" hidden></p><div class="form-actions">${id?`<button type="button" class="icon-btn delete-action" data-act="delete-session" data-id="${id}" aria-label="Delete this study block">${icon('trash')}</button>`:''}<button class="button secondary" type="button" data-act="close-modal">Cancel</button><button class="button primary" type="submit">${id?'Save study block':'Add study block'}</button></div></form></div>`);
+  }
+  async function saveSession(form){
+    clearFormError();if(!form.reportValidity())return;const f=new FormData(form),id=form.dataset.id,title=String(f.get('title')).trim(),startAt=`${f.get('date')}T${f.get('time')}`,duration=Number(f.get('duration'));
+    if(!title)return formError('Please enter a study block title, not just spaces.');if(!C.parseLocal(startAt))return formError('Enter a valid local date and time.');if(!Number.isInteger(duration)||duration<5||duration>480)return formError('Duration must be a whole number from 5 to 480 minutes.');
+    const record={id:id||C.uid('session'),title,subjectId:f.get('subjectId')||null,startAt,durationMinutes:duration,done:f.get('done')==='yes',notes:String(f.get('notes')).trim()};
+    if(C.sessionOverlaps(record,state.sessions)&&!await ask('Your study blocks overlap.','This time overlaps another study block. Keep both blocks anyway?','Keep both'))return;
+    if(mutate(s=>{if(id)s.sessions=s.sessions.map(x=>x.id===id?record:x);else s.sessions.push(record);},{expected:ui.formVersion})){closeModal();toast(id?'Study block updated.':'Study block added.');}
+  }
+  function toggleTask(id){const task=state.tasks.find(t=>t.id===id);if(!task)return;const previous=task.status,previousCompleted=task.completedAt;
+    if(mutate(s=>{const t=s.tasks.find(t=>t.id===id);t.status=t.status==='done'?'todo':'done';t.completedAt=t.status==='done'?new Date().toISOString():null;}))toast(previous==='done'?'Task reopened.':'One less thing on your list. Well done!',false,()=>mutate(s=>{const t=s.tasks.find(t=>t.id===id);if(t){t.status=previous;t.completedAt=previousCompleted;}}));
+  }
+  async function deleteRecord(kind,id){
+    const collection=kind==='task'?'tasks':kind==='subject'?'subjects':'sessions',record=state[collection].find(r=>r.id===id);if(!record)return;
+    const title=kind==='subject'?record.name:record.title;
+    const message=kind==='subject'?`Remove “${title}”? Its tasks and study blocks will move to General, not be deleted.`:`Remove “${title}” from your planner? Export a backup first to keep a copy.`;
+    if(!await ask(`Delete ${kind==='session'?'study block':kind}?`,message,'Delete',true))return;
+    if(mutate(s=>{s[collection]=s[collection].filter(r=>r.id!==id);if(kind==='subject'){s.tasks.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});s.sessions.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});}})){
+      if(kind==='subject'&&ui.filters.subject===id){ui.filters.subject='all';render();}if($('#modal').open)closeModal();toast(`${kind==='session'?'Study block':cap(kind)} deleted.`);
+    }
+  }
+  function download(text,name,type='application/json'){
+    const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();downloadUrls.push(url);setTimeout(()=>{URL.revokeObjectURL(url);downloadUrls=downloadUrls.filter(v=>v!==url);},60000);
+  }
+  function exportData(){download(JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2),`StudyTrack-backup-${C.dateKey(new Date())}.json`);toast('Backup exported. Keep this file somewhere safe.');}
+  async function importData(file){
+    if(!file)return;
+    if(file.size>8*1024*1024){toast('Backup is too large. Maximum file size is 8 MB.',true);return;}
+    let next;
+    try{next=C.validateState(JSON.parse(await file.text()));}catch(err){toast(`Cannot import: ${err.message}`,true);return;}
+    if(!await ask('Replace this planner?',`This backup contains ${next.tasks.length} tasks, ${next.subjects.length} subjects, and ${next.sessions.length} study blocks. Importing replaces everything currently in this planner. Export your current data first to keep it.`,'Import and replace'))return;
+    if(commit(next,{force:true})){firstRun=false;ui.filters={query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'};setView('overview');toast('Backup restored.');}
+  }
+  function welcome(){openModal(`<div class="welcome-icon">${icon('book')}</div><div class="dialog-body"><h2 id="modalTitle">A calmer place<br>for your student life.</h2><p>Meet StudyTrack. Organize your subjects, keep deadlines in sight, and make a little space to study.</p><div class="field"><label for="welcomeName">What should we call you? (optional)</label><input id="welcomeName" maxlength="40" placeholder="Your first name" autocomplete="off"></div><div class="welcome-options"><button class="button primary" data-act="welcome-sample">${icon('spark')}Try the sample planner</button><button class="button secondary" data-act="welcome-fresh">Start empty ${icon('arrow')}</button></div><p class="welcome-note">No account. No uploads. Data stays in this browser when saving is available. Sample tasks are fictional.</p></div>`,'welcome');}
+  async function replacePlanner(mode,initial=false){
+    if(!initial&&!await ask(mode==='sample'?'Load the sample planner?':'Start with a clean planner?','This replaces all current tasks, subjects, and study blocks. Export your current planner first to keep a copy.',mode==='sample'?'Load sample':'Start fresh',true))return;
+    const name=initial?($('#welcomeName')?.value.trim()||''):state.profile.name;
+    if(commit(mode==='sample'?C.sample(new Date(),name):C.blank(name),{force:true})){firstRun=false;closeModal();ui.filters={query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'};setView('overview');toast(mode==='sample'?'Sample planner loaded. All example data is fictional.':'Your planner is ready. Start by adding a subject or a task.');}
+  }
+
+  document.addEventListener('click',async event=>{
+    const el=event.target.closest('button');if(!el||el.disabled)return;
+    if(el.dataset.view){setView(el.dataset.view);return;}
+    const act=el.dataset.act,id=el.dataset.id;
+    switch(act){
+      case 'add-task':openTask();break;case 'edit-task':openTask(id);break;case 'toggle-task':toggleTask(id);break;
+      case 'add-subject':openSubject();break;case 'edit-subject':openSubject(id);break;
+      case 'add-session':openSession(null,el.dataset.day||null);break;case 'edit-session':openSession(id);break;
+      case 'plan-next':openSession(null,null,state.tasks.find(t=>t.id===id)||null);break;
+      case 'delete-task':await deleteRecord('task',id);break;case 'delete-subject':await deleteRecord('subject',id);break;case 'delete-session':await deleteRecord('session',id);break;
+      case 'close-modal':closeModal();break;case 'confirm-no':answerConfirm(false);break;case 'confirm-yes':answerConfirm(true);break;
+      case 'show-tasks':goTasks(el.dataset.period||'all');break;case 'subject-tasks':goTasks('all',id);break;
+      case 'task-tab':ui.filters.status=el.dataset.status;updateTaskResults();break;
+      case 'clear-filters':ui.filters={query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'};render();break;
+      case 'previous-week':ui.week=C.addDays(ui.week,-7);render();break;case 'next-week':ui.week=C.addDays(ui.week,7);render();break;case 'current-week':ui.week=C.weekStart(new Date());render();break;
+      case 'export':exportData();break;case 'import':$('#importFile').value='';$('#importFile').click();break;
+      case 'recover':if(corruptRaw)download(corruptRaw,`StudyTrack-unreadable-data-${C.dateKey(new Date())}.txt`,'text/plain');break;
+      case 'fresh':await replacePlanner('personal');break;case 'sample':await replacePlanner('sample');break;
+      case 'welcome-sample':await replacePlanner('sample',true);break;case 'welcome-fresh':await replacePlanner('personal',true);break;
+      case 'print':window.print();break;
+    }
+  });
+  document.addEventListener('submit',event=>{
+    const form=event.target;event.preventDefault();
+    if(form.id==='taskForm')saveTask(form);
+    else if(form.id==='subjectForm')saveSubject(form);
+    else if(form.id==='sessionForm')saveSession(form);
+    else if(form.id==='profileForm'){if(mutate(s=>{s.profile.name=$('#profileName').value.trim();}))toast('Display name updated.');}
+  });
+  document.addEventListener('input',event=>{if(event.target.id==='taskSearch'){ui.filters.query=event.target.value;updateTaskResults();}});
+  document.addEventListener('change',event=>{
+    if(event.target.dataset.filter){ui.filters[event.target.dataset.filter]=event.target.value;updateTaskResults();}
+    if(event.target.id==='importFile')importData(event.target.files[0]);
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.ctrlKey||event.metaKey||event.altKey||event.target.closest('input,textarea,select,[contenteditable="true"]')||$('dialog[open]'))return;
+    if(event.key.toLowerCase()==='n'){event.preventDefault();openTask();}
+  });
+  window.addEventListener('hashchange',()=>{const v=location.hash.slice(1);if(navItems.some(n=>n[0]===v)){ui.view=v;render();}});
+  // Recalculate deadline indicators as time passes, without interrupting an open form or search field.
+  setInterval(()=>{if(!document.hidden&&!$('dialog[open]')&&!document.activeElement?.matches('input,textarea,select'))render();},60000);
+  window.addEventListener('beforeunload',event=>{if(storageIssue&&(state.tasks.length||state.subjects.length||state.sessions.length)){event.preventDefault();event.returnValue='';}});
+  shell();render();if(firstRun)welcome();
+})();
+
+</script>
+</body>
+</html>
