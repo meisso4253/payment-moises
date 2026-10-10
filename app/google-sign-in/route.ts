@@ -1,6 +1,12 @@
 import { authBindings,googleReady } from '../../lib/auth';
 export const dynamic='force-dynamic';
-export async function GET(){
+export async function GET(req:Request){
+  // Google's allowed origin is the stable production domain. Deployment aliases
+  // must redirect before loading GIS, so their popup never uses an unknown origin.
+  const origin=authBindings().APP_ORIGIN;
+  if(origin && new URL(req.url).origin!==new URL(origin).origin){
+    return new Response(null,{status:307,headers:{Location:new URL('/google-sign-in',origin).href,'Cache-Control':'no-store'}});
+  }
   const clientId=googleReady()?authBindings().GOOGLE_CLIENT_ID:'';
   const html=`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in · StudyTrack</title><style>body{margin:0;background:#f7f8fc;color:#24233a;font:15px/1.7 system-ui,sans-serif;display:grid;min-height:100dvh;place-items:center}main{box-sizing:border-box;width:min(460px,calc(100% - 36px));padding:36px;border:1px solid #e5e0f1;border-radius:20px;background:white;box-shadow:0 12px 50px #3028500c}h1{line-height:1.2;font-size:30px;letter-spacing:-1px}p{color:#7b788c}a{color:#6751d3}.brand{font-weight:750;color:#6751d3}.fine{font-size:12px}.error{color:#ad3c57;background:#fff1f4;border-radius:8px;padding:10px;font-size:13px}[hidden]{display:none!important}#googleButton{margin:24px 0;min-height:44px}#status{font-size:12px}button{font:inherit}</style></head><body><main><div class="brand">StudyTrack</div><h1>Your study space,<br>one sign-in away.</h1><p>Use your Google account to save your planner, track premium access, and view your payments.</p>${clientId?`<div id="googleButton"></div><p id="status" role="status">Loading Google sign-in…</p><p id="error" class="error" role="alert" hidden></p><script>
     function showError(message){const el=document.getElementById('error');el.textContent=message;el.hidden=false;document.getElementById('status').textContent='';}

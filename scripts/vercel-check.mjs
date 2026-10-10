@@ -96,4 +96,21 @@ const html=readFileSync('lib/planner.html','utf8');
 for(const [,code] of html.matchAll(/<script>([\s\S]*?)<\/script>/g))new Script(code);
 check(!html.includes('signin-with-chatgpt'),'Planner contains only Google sign-in');
 check((await db.execute('SELECT COUNT(*) AS total FROM studytrack_migrations')).rows[0].total===3,'Migrations are idempotent');
+const signIn=await import('../app/google-sign-in/route.ts');
+const alias=await signIn.GET(new Request('https://temporary-deployment.vercel.app/google-sign-in?return_to=https://evil.test'));
+check(alias.status===307&&alias.headers.get('location')===origin+'/google-sign-in','Deployment aliases redirect to the configured Google origin');
+check(alias.headers.get('cache-control')==='no-store','Sign-in redirects cannot cache an old domain');
+const canonical=await signIn.GET(new Request(origin+'/google-sign-in'));
+check(canonical.status===200&&(await canonical.text()).includes('accounts.google.com/gsi/client'),'Canonical sign-in page loads Google without redirect loops');
+const {receiptStorageReady}=await import('../lib/receipt-storage.ts');
+delete process.env.BLOB_READ_WRITE_TOKEN;
+process.env.BLOB_STORE_ID='store_LOCAL_FIXTURE';
+check(!receiptStorageReady(),'Receipt collection remains disabled without storage credentials');
+const contextKey=Symbol.for('@vercel/request-context'), previousContext=globalThis[contextKey];
+try{
+  globalThis[contextKey]={get:()=>({headers:{'x-vercel-oidc-token':'LOCAL-FIXTURE-NOT-A-REAL-TOKEN'}})};
+  check(receiptStorageReady(),'Managed Blob credentials are recognized from the trusted runtime context');
+  delete process.env.BLOB_STORE_ID;
+  check(!receiptStorageReady(),'Managed credentials still require a connected Blob store');
+}finally{if(previousContext===undefined)delete globalThis[contextKey];else globalThis[contextKey]=previousContext;}
 db.close();console.log(`Verified ${checks} Vercel migration checks. Real Google login and Blob require owner-configured services.`);

@@ -1,7 +1,12 @@
 import { put, get, del } from '@vercel/blob';
+import { getVercelOidcTokenSync } from '@vercel/oidc';
 
 export function receiptStorageReady() {
-  return !!process.env.BLOB_READ_WRITE_TOKEN || !!(process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN);
+  if(process.env.BLOB_READ_WRITE_TOKEN)return true;
+  if(!process.env.BLOB_STORE_ID)return false;
+  // Match the Blob SDK: runtime OIDC may arrive through Vercel's request context
+  // rather than a process environment variable. Never expose the token to clients.
+  try{return !!getVercelOidcTokenSync();}catch{return false;}
 }
 export const receiptStorage = {
   async put(key: string, bytes: Uint8Array, options: { httpMetadata: { contentType: string } }) {
