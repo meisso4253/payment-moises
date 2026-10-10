@@ -11,7 +11,7 @@ async function handle(req:Request){
     req=new Request(req.url,{method:req.method,headers:req.headers,body});
   }
     if(!['/ok','/get-session','/sign-out','/one-tap/callback'].includes(path))return Response.json({error:'Not found.'},{status:404});
-    if(!googleReady())return Response.json({error:'Google sign-in is awaiting the app’s Google client ID.'},{status:503,headers:{'Cache-Control':'no-store'}});
+    if(!googleReady())return Response.json({error:'Google sign-in is awaiting the owner’s deployment configuration.'},{status:503,headers:{'Cache-Control':'no-store'}});
     const response=await getAuth().handler(req);const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');
     return new Response(response.body,{status:response.status,headers});
   }catch(error){console.error('StudyTrack authentication failed',error instanceof Error?error.name:'unknown');return Response.json({error:'Unable to sign in. Please try again.'},{status:500});}

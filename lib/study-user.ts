@@ -1,7 +1,6 @@
-import { getChatGPTUser } from '../app/chatgpt-auth';
 import { authBindings, getAuth, googleReady } from './auth';
 
-export type StudyUser={userId:string,email:string,displayName:string,provider:'google'|'chatgpt'};
+export type StudyUser={userId:string,email:string,displayName:string,provider:'google'};
 export async function getStudyUser(headers:Headers):Promise<StudyUser|null>{
   const b=authBindings();
   if(googleReady()){
@@ -26,9 +25,6 @@ export async function getStudyUser(headers:Headers):Promise<StudyUser|null>{
     }
     return {userId:link.app_user_id,email,displayName:u.name||email,provider:'google'};
   }
-  // Temporary compatibility while the owner creates the Google OAuth client.
-  // Automatically stops accepting ChatGPT-only sessions when Google is configured.
-  const old=await getChatGPTUser();if(!old)return null;
-  await b.DB.prepare('INSERT INTO legacy_identities (user_id,email) VALUES (?,?) ON CONFLICT(user_id) DO UPDATE SET email=excluded.email').bind(old.userId,old.email.toLowerCase()).run();
-  return {...old,provider:'chatgpt'};
+  // Hosting identity headers are not authentication on Vercel.
+  return null;
 }

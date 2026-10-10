@@ -361,14 +361,14 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
   function renderAccess(){
     if(loadError)return `<section class="panel panel-pad">${heading('CONNECTION','Unable to load your account.',E(loadError))}<button class="button primary" data-act="refresh-account">Try again</button></section>`;
     if(!account)return `<section class="panel panel-pad"><h1>Opening your study space…</h1><p>Loading your account and cloud planner.</p></section>`;
-    return `<section class="premium-hero"><div class="eyebrow">STUDYTRACK</div><h1>A calmer place<br>for your student life.</h1><p>Keep your deadlines, subjects, and study blocks together.<br>Sign in to save your planner across devices.</p>${account.googleReady?`<a class="button primary" href="/google-sign-in" target="_top">Sign in with Google ${icon('arrow')}</a>`:`<a class="button primary" href="/signin-with-chatgpt?return_to=%2Fstudy" target="_top">Sign in with ChatGPT ${icon('arrow')}</a><p class="premium-fine">Google sign-in is being set up. The current sign-in remains available until it is ready.</p>`}<p class="premium-fine">Free planner · Optional premium: ₱49 / 120 days · GCash<br><a href="/privacy" target="_top">Privacy notice</a></p></section>`;
+    return `<section class="premium-hero"><div class="eyebrow">STUDYTRACK</div><h1>A calmer place<br>for your student life.</h1><p>Keep your deadlines, subjects, and study blocks together.<br>Sign in to save your planner across devices.</p><a class="button primary" href="/google-sign-in" target="_top">Sign in with Google ${icon('arrow')}</a>${account.googleReady?'':'<p class="premium-fine">The owner is finishing the sign-in setup. Please check back shortly.</p>'}<p class="premium-fine">Free planner · Optional premium: ₱49 / 120 days · GCash<br><a href="/privacy" target="_top">Privacy notice</a></p></section>`;
   }
   function accountChrome(){
     document.querySelectorAll('[data-view="payments"]').forEach(x=>x.hidden=!account?.isAdmin);
     const badge=$('#planBadge');if(badge){badge.textContent=hasPremium()?'Premium active':'Free plan';badge.className='plan-pill '+(hasPremium()?'active':'');}
     const side=$('#accountSide');if(side)side.innerHTML=account?.user?`<strong>${E(account.user.name)}</strong><p>${E(account.user.email)}</p>${signOutButton()}`:'Sign in to save across devices.';
   }
-  function signOutButton(){return account?.user?.provider==='google'?'<button class="text-button" data-act="google-signout">Sign out</button>':'<a href="/signout-with-chatgpt?return_to=%2Fstudy" target="_top">Sign out</a>';}
+  function signOutButton(){return '<button class="text-button" data-act="google-signout">Sign out</button>';}
   async function signOutGoogle(){try{await api('auth/sign-out',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});location.replace('/study');}catch(err){toast(err.message,true);}}
   function renderPremium(){
     const pending=paymentRows.find(p=>p.user_id===account.user.id&&p.status==='pending');

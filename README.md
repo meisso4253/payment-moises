@@ -1,62 +1,53 @@
 # StudyTrack
 
-Student planner with Google accounts, optional **PHP 49 premium access for 120 days**, manual GCash payment review, and semester transaction reports.
+Student planner with Google accounts, **PHP 49 premium access for 120 days**, manual GCash receipt review, and semester transaction reports.
+
+**This repository is now a standard Next.js app ready to import into Vercel.** The Cloudflare runtime has been replaced with Turso (SQLite database) and private Vercel Blob receipt storage. Follow [VERCEL-SETUP.md](VERCEL-SETUP.md) to connect the services and enable sign-in/payments.
+
+## Deploy
+
+1. In [Vercel](https://vercel.com/new), import `meisso4253/payment-moises`. Use **Next.js**, root directory `./`, and the default build command `npm run build`.
+2. Connect a **Turso database** and a **private Vercel Blob store**. Add the environment variables listed in [VERCEL-SETUP.md](VERCEL-SETUP.md).
+3. Add the deployment's exact production origin to your existing Google client's **Authorized JavaScript origins**. Set `APP_ORIGIN` to that same origin.
+4. Redeploy. Sign in with your configured administrator Google account to review payments and export semester evidence.
+
+The first build can succeed without credentials, showing a setup/sign-in screen. Accounts require database/auth configuration, and GCash collection stays disabled until the private storage and receiving-account settings are present. Builds apply pending schema migrations automatically when the database is configured.
 
 ## Features
 
-- Subjects, tasks, deadlines, weekly study blocks, and a planner saved across devices.
-- Google sign-in with server-verified identity tokens and signed database sessions.
-- GCash receipt submission with customer name, transaction reference, date, and proof image.
-- Protected administrator panel to approve or reject payments.
-- Premium focus timer, subject insights, and progress export.
-- Semester evidence ZIP containing the customer/amount tabulation and approved transaction proofs.
+- Subjects, deadlines, tasks, weekly study blocks, and cloud planner saves across devices.
+- Google Identity Services with server-verified tokens and signed database sessions.
+- PNG/JPEG transaction proof, customer name, date, and unique reference number.
+- Admin-only receipt approval/rejection, premium grants, and payment history.
+- Premium focus timer, subject insights, and progress CSV.
+- Semester ZIP containing customer/amount tabulation and matching approved receipt images.
 
-GCash payments are manual transfers reviewed by the administrator. This is not an automatic payment gateway.
+GCash transfers are manually checked against the receiving account. This is not an automatic payment gateway. Each approved payment grants 120 days; renewals extend existing access. Payment amounts are fixed on the server.
 
-## Deployment status
+## Local development
 
-**This source currently targets Cloudflare Workers through the Sites/Vinext starter. It is not yet a Vercel-compatible Next.js project.** Importing this repository into Vercel alone will not move the existing accounts, payment records, or receipt storage.
+Use Node 22.13+ (Node 24 recommended). Copy `.env.example` to the ignored `.env.local`, supply development service credentials, then run:
 
-Before deploying to Vercel:
+```sh
+npm ci
+npm run db:migrate
+npm run dev
+```
 
-1. Convert the build and server runtime to a Vercel-supported framework/runtime.
-2. Replace the Cloudflare D1 bindings with a compatible database and adapt the queries, migrations, and atomic payment approvals.
-3. Replace the R2 receipt binding with private file storage, preserving customer/admin authorization.
-4. Configure the environment variables below in the deployment dashboard.
-5. Register the new production origin in the existing Google OAuth client's Authorized JavaScript origins.
-6. Migrate existing database records and receipt files separately if they are needed. This repository contains source and schema migrations only.
+Use a separate development database and Blob store. Register `http://localhost:3000` in Google's allowed origins if testing real Google sign-in locally.
 
-A Vercel domain does not by itself change Google's consent-screen name. Configure StudyTrack in Google Auth Platform Branding, complete Google's verification requirements, and publish the approved branding.
+```sh
+npm test
+npm run build
+npm run typecheck
+```
 
-## Runtime configuration
+Tests use a disposable local SQLite database, signed fixture sessions, and an in-memory receipt store. They never send GCash payments or write to production services. A real Google login and private Blob upload should be checked after configuring Vercel.
 
-| Variable | Purpose |
-| --- | --- |
-| `APP_ORIGIN` | Exact production origin, including `https://`, without a path. |
-| `GOOGLE_CLIENT_ID` | Google Web application OAuth client ID. |
-| `BETTER_AUTH_SECRET` | Strong random session-signing secret; keep it stable and private. |
-| `ADMIN_EMAIL` | Verified Google email allowed to review payments and export reports. |
-| `GCASH_NAME` | Receiving GCash account name. |
-| `GCASH_NUMBER` | Receiving Philippine mobile number. |
+## Source and maintenance
 
-The current Cloudflare runtime also requires a D1 binding named `DB` and an R2 binding named `BUCKET`. Apply all migrations in `drizzle/` to the database before running the app. The checked-in hosting file contains binding declarations, with no existing Site identity or production credentials.
+The supplied planner is preserved at `lib/planner-original.html`. Update `lib/premium-ui.js` / `lib/premium.css`, then run `python scripts/prepare-planner.py` to regenerate the planner. Builds bundle the generated HTML using Node, so Vercel does not require Python. Database migrations are versioned under `drizzle/` and applied once using an atomic migration ledger.
 
-Store real configuration in ignored local `.dev.vars` files or the hosting platform's environment settings. Never commit secrets, session cookies, real receipts, or database dumps. A placeholder local configuration is provided in `.dev.vars.example`.
+See [OPERATIONS.md](OPERATIONS.md) for payment review and reporting, and [GOOGLE-SETUP.md](GOOGLE-SETUP.md) for Google branding.
 
-## Source layout
-
-- `lib/planner-original.html`: retained original planner.
-- `lib/premium-ui.js` and `lib/premium.css`: account, payment, and premium interface.
-- `lib/planner.html`: generated planner served at `/study`.
-- `app/api/`: authenticated planner, receipt, payment review, and Google sign-in routes.
-- `lib/auth.ts` and `lib/study-user.ts`: sessions and identity mapping.
-- `db/` and `drizzle/`: database schema and migrations.
-- `scripts/prepare-planner.py`: regenerates the planner and server validator after UI changes.
-
-See [OPERATIONS.md](OPERATIONS.md) for payment review and reporting, and [GOOGLE-SETUP.md](GOOGLE-SETUP.md) for Google setup. Those documents also describe the original Sites hosting workflow.
-
-## Development
-
-Use Node.js 22.13 or later. Install dependencies with `npm ci`. The current preview uses `npm run dev` and Cloudflare's local bindings. Check TypeScript with `npx tsc --noEmit`.
-
-The local API check scripts use disposable test fixtures and must never target production. Successful local checks do not represent real GCash transactions or a completed Google login.
+Existing accounts, payment data, and receipts on the previous Sites deployment are **not copied by importing this repository**. Keep that app available until any required data has been separately exported and migrated. The repository contains source and schema migrations only.

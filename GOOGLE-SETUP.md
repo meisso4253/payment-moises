@@ -1,26 +1,27 @@
-# Activate Google sign-in for StudyTrack
+# Google sign-in for StudyTrack
 
-The integration is prepared. One app-specific Google client ID is still required. No Google password or OAuth client secret is needed for the Sign in with Google button used here.
+StudyTrack uses the official Google Identity Services button and Better Auth. The server verifies the Google ID token, then creates a signed HttpOnly database session. No Google password or OAuth client secret is needed for this integration.
 
-1. Open [Google Cloud Console](https://console.cloud.google.com/) in your browser and sign in with the Google account that should manage StudyTrack.
-2. Create a project named **StudyTrack** (or select an existing project you own).
-3. Open **Google Auth Platform → Branding** and complete the app setup: app name **StudyTrack**, your support/contact email, and audience **External**. The project uses only basic Google identity (name, email, account identifier), not Gmail or Drive access. If Google asks for the privacy notice URL, use `https://studytrack-premium-emman.theostenmatrix.chatgpt.site/privacy`.
-4. Open **Clients → Create client**. Select **Web application**, name it **StudyTrack Web**, and add this exact **Authorized JavaScript origin**:
+## Register the Vercel origin
 
-   ```text
-   https://studytrack-premium-emman.theostenmatrix.chatgpt.site
-   ```
+1. Open [Google Auth Platform](https://console.cloud.google.com/auth/overview), select your StudyTrack project, then open **Clients**.
+2. Open your existing **Web application** client; a new client ID is not necessary.
+3. Under **Authorized JavaScript origins**, add your stable production origin, e.g. `https://your-studytrack.vercel.app`. Use the exact origin in Vercel's `APP_ORIGIN`, with no page path or trailing slash.
+4. Save. Keep the old site's origin while that app is still in use. Google settings can take time to propagate.
+5. In Vercel set `GOOGLE_CLIENT_ID` to the public client ID ending in `.apps.googleusercontent.com` and redeploy. Configure the database and session secret as documented in [VERCEL-SETUP.md](VERCEL-SETUP.md).
 
-   Do not add `/study`, a hash, or a trailing slash. This popup button uses a server-verified ID token, so an authorized redirect URI is not required for this integration.
-5. Create the client and copy its **Client ID**, ending in `.apps.googleusercontent.com`. Send that public client ID in this chat so it can be configured securely as `GOOGLE_CLIENT_ID` in the app’s runtime.
-6. If the Google project remains in **Testing**, add your Gmail address and your student testers under **Audience → Test users**. For use by all students, publish the Google app to **In production**, following any requirements Google shows for your project. Do not request additional scopes.
+Only basic identity is requested (name, email, Google account identifier). No Gmail/Drive scopes are used. In **Audience**, follow Google's production requirements to allow student Google accounts. If a testing restriction applies, add test users while testing.
 
-Google setup instructions: [Get a Google API client ID](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid), [Better Auth Google button integration](https://better-auth.com/docs/plugins/one-tap).
+## Displaying StudyTrack in Google's popup
 
-## Activation and existing records
+In **Branding**, set the app name to **StudyTrack**, add support/contact details, homepage and privacy URL (`YOUR_PRODUCTION_ORIGIN/privacy`), and complete any domain/branding verification Google requires. Publish the approved branding. Google may still show the actual website domain in parts of its sign-in interface, including FedCM UI.
 
-The runtime already has the authentication session secret and the fixed app origin. After setting `GOOGLE_CLIENT_ID`, deploy the prepared version so the new value applies. The main sign-in button then switches to Google automatically, and protected app endpoints accept verified Google sessions rather than ChatGPT-only identity headers.
+Changing Authorized JavaScript origins controls which websites can use a client; it does not rename the consent screen. A new OAuth client ID also does not automatically change the displayed domain. An owned custom domain can provide a StudyTrack address, but must be purchased/owned and configured separately if desired.
 
-Before activation, existing customers with planner-only records should sign in once using the current app so their old account ID/email mapping is recorded by this version. Google Gmail users with one matching old account or payment identity retain that account’s existing planner, receipt, and premium record keys. Ambiguous identities are never merged automatically. Existing payments and receipt files are not overwritten or recreated by switching authentication.
+## Security and existing accounts
 
-For local testing, use an ignored `.dev.vars` file and register the exact loopback origin if testing with a real Google client. Do not commit runtime secrets, production Google tokens, or session cookies.
+Every protected endpoint requires a valid database session, verified email, and Google provider account. Hosting identity headers do not authenticate users on Vercel. The configured admin email is compared on the server. Email/password registration and unrelated authentication endpoints are disabled.
+
+Old planner/payment identity links can be preserved when migrating records into Turso. A unique verified Gmail match can link to a previous account key; ambiguous matches are never merged automatically. The deployment does not itself migrate the old Sites database or receipt storage.
+
+Official guidance: [Google client/origin setup](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid), [Google branding](https://support.google.com/cloud/answer/15549049?hl=en), [Better Auth Google button](https://better-auth.com/docs/plugins/one-tap).

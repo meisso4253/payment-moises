@@ -15,33 +15,18 @@ Student planner with shared accounts, GCash premium access (PHP 49 for 120 days)
 
 Google sign-in uses Google Identity Services and Better Auth. The server verifies Google's signed identity token for the configured client ID, then stores a database session in a signed HttpOnly cookie. The Google provider subject owns the provider account. Every protected API checks the session and verified email; administrative routes compare the authenticated email with `ADMIN_EMAIL`. Browser state cannot grant premium or administrator access. Only Google sign-in is exposed; email/password registration and other authentication endpoints are disabled.
 
-While `GOOGLE_CLIENT_ID` is missing, the original Sites ChatGPT sign-in remains available and records legacy user/email mappings. Once Google is configured, ChatGPT-only identity headers no longer authenticate the app. See `GOOGLE-SETUP.md` for the one-time owner setup and safe account migration. Receipt keys, grants, and planner rows stay unchanged; identity links point the Google user at their previous records when there is an unambiguous verified Gmail match.
+Only Google sessions authenticate customers. Missing configuration shows the setup screen; there is no hosting-header fallback. See `GOOGLE-SETUP.md` for allowed origins and branding. Existing account records need separate migration from the old hosting database.
 
-D1 stores planners, payments, reviews, and premium grants. R2 stores receipt files behind an authorized API route. Receipt image URLs are not public assets. Planner import/reset cannot erase payment evidence or grant access.
+Turso stores planners, accounts, payments, reviews, and premium grants. Private Vercel Blob stores receipt files behind an authorized API route. Planner import/reset cannot erase payment evidence or grant access.
 
-Amounts are fixed server-side at 4900 centavos, access at 120 days, and references are normalized and unique. A partial unique index allows only one pending payment per customer. Approval and the grant use an atomic D1 batch. Planner writes use version checks to prevent overwriting changes from another window. Payment dates and reports use Asia/Manila; planner wall-clock dates follow the device timezone.
+Amounts are fixed server-side at 4900 centavos, access at 120 days, and references are normalized and unique. A partial unique index allows only one pending payment per customer. Approval and the grant use an atomic Turso write transaction. Planner writes use version checks to prevent overwriting changes from another window. Payment dates and reports use Asia/Manila; planner wall-clock dates follow the device timezone.
 
-## Configuration
+## Configuration and maintenance
 
-Runtime environment values are configured in Sites, separately from source:
+Follow [VERCEL-SETUP.md](VERCEL-SETUP.md). Environment variables belong in Vercel or the ignored `.env.local`; do not commit credentials. Collection requires the receiving-account settings, admin email, and private Blob credentials. Accounts require database and Google auth configuration.
 
-- `ADMIN_EMAIL`: verified Google sign-in email allowed to review and export payments.
-- `GCASH_NAME`: displayed recipient name.
-- `GCASH_NUMBER`: Philippine mobile number in the format `09xxxxxxxxx`.
-- `GOOGLE_CLIENT_ID`: public Google Web application client ID, with the published site registered as an authorized JavaScript origin.
-- `BETTER_AUTH_SECRET`: secret used to sign app session cookies. Keep stable across deployments; rotating it signs users out.
-- `APP_ORIGIN`: exact published site origin used for auth URLs and trusted origins.
-
-Collection stays disabled unless all three are configured. Never put an admin email allowlist or secrets into the browser bundle. `ADMIN_EMAIL` is stored as a secret runtime value.
-
-For local development, copy the key names into an ignored `.dev.vars` file. The starter's portable dev preview signs in as `seedy@sites.test`; use that as the **local-only** admin value. Production uses Google sign-in when configured and the verified Google administrator email. Local D1/R2 data is never included in deployment.
-
-## Maintenance
-
-Run `python scripts/prepare-planner.py` after changing `lib/premium-ui.js` or `lib/premium.css`. This generates `lib/planner.html` and the server planner validator from the retained original. Run `npm run db:generate` after schema changes, append migrations, and build with the Sites build helper. See the installed Sites skill for publication and source synchronization.
-
-The `scripts/integration-check.mjs` check uses disposable local data and simulated identity headers against `http://127.0.0.1:8787`. It must never target production. It verifies account isolation, receipt storage, duplicate protection, approval, rejection, renewal, fixed amounts, premium authorization, and planner conflict checks.
+Run `python scripts/prepare-planner.py` after changing the premium UI or CSS. This regenerates the planner and server validator. `npm run build` bundles the HTML, applies unapplied schema migrations when configured, and compiles Next.js. Append schema changes with `npm run db:generate`; never edit an already-applied migration.
 
 ## Verification
 
-The initial version passed 29 API integration checks, JavaScript syntax and TypeScript checks, a production build, a browser receipt-submission/review walkthrough, and an evidence ZIP validation checking receipt paths, totals, and rejection exclusion. No real GCash transaction was performed by these checks.
+`npm test` uses a disposable SQLite database, signed local Google-session fixtures, and in-memory receipt storage. Checks include customer/admin isolation, receipt ownership, fixed amounts, duplicate references, concurrent approval, rejection, renewal, planner conflicts, transaction rollback, forged tokens, and sign-out. No real GCash transfer is made, and no production storage is accessed. Test a real Google sign-in and private Blob upload after owner configuration.
