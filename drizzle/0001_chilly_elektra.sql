@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `one_pending_payment_per_customer` ON `payments` (`user_id`) WHERE "payments"."status" = 'pending';
