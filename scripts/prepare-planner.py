@@ -8,6 +8,10 @@ body=core.split("function () {",1)[1].rsplit('});',1)[0]
 html=original
 html=re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>','',html)
 html=html.replace('</style>',(root/'lib/premium.css').read_text(encoding='utf-8')+'\n</style>',1)
+html=html.replace('</style>',(root/'lib/theme.css').read_text(encoding='utf-8')+'\n'+(root/'lib/planner-theme.css').read_text(encoding='utf-8')+'\n</style>',1)
+html=html.replace('<title>', '<script>'+(root/'lib/theme-init.js').read_text(encoding='utf-8')+'</script>\n<title>',1)
+theme_button='<button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme" title="Switch color theme"><svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.2A9 9 0 0 1 10.8 3.2a9 9 0 1 0 10 10Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>'
+html=html.replace('<div class="top-actions">','<div class="top-actions"><a class="planner-home-link" href="/">Home</a>'+theme_button,1)
 start=html.index('  try {\n    persistedRaw=localStorage.getItem(KEY);')
 end=html.index('  const ui=',start)
 html=html[:start]+html[end:]
@@ -58,4 +62,3 @@ html=html.replace('a local-first student planner MVP.','a cloud student planner 
 html=html.replace('No internet connection is needed for the downloaded single-file app.','An internet connection is required for sign-in and cloud saving.')
 html=html.replace("  function setView(view){", "  function setView(view){if(view==='payments'&&!account?.isAdmin)return;")
 (root/'lib/planner.html').write_text(html,encoding='utf-8')
-(root/'app/page.tsx').write_text("import { redirect } from 'next/navigation';\nexport default function Home() { redirect('/study'); }\n",encoding='utf-8')

@@ -7,6 +7,38 @@
 <meta name="description" content="StudyTrack: a cloud student planner with GCash premium access. Organize subjects, tasks, deadlines, and study blocks.">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='11' fill='%236751d3'/%3E%3Cpath d='M9 10h9q3 0 3 3v19q-3-4-8-4H9zM21 13q3-3 10-3v18q-7 0-10 4' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+<script>(function () {
+  const key = 'studytrack-theme-v1';
+  const root = document.documentElement;
+  const system = window.matchMedia('(prefers-color-scheme: dark)');
+  let preference;
+  try { preference = localStorage.getItem(key); } catch {}
+  if (preference !== 'light' && preference !== 'dark') preference = null;
+  function apply(theme) {
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+      const label = 'Switch to ' + (theme === 'dark' ? 'light' : 'dark') + ' mode';
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    });
+  }
+  apply(preference || (system.matches ? 'dark' : 'light'));
+  document.addEventListener('DOMContentLoaded', function () { apply(root.dataset.theme); });
+  document.addEventListener('click', function (event) {
+    if (!event.target.closest?.('[data-theme-toggle]')) return;
+    preference = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, preference); } catch {}
+    apply(preference);
+  });
+  system.addEventListener('change', function (event) { if (!preference) apply(event.matches ? 'dark' : 'light'); });
+  window.addEventListener('storage', function (event) {
+    if (event.key !== key) return;
+    preference = event.newValue === 'dark' || event.newValue === 'light' ? event.newValue : null;
+    apply(preference || (system.matches ? 'dark' : 'light'));
+  });
+})();
+</script>
 <title>StudyTrack — Your day, in focus.</title>
 <style>
 :root{--ink:#20233b;--muted:#777b8c;--border:#e8e9f1;--bg:#f7f8fc;--white:#fff;--primary:#6751d3;--primary-dark:#5140b0;--tint:#f0edfc;--teal:#148276;--rose:#b94458;--shadow:0 5px 24px #28234a06;--radius:18px;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg);font-synthesis:none}
@@ -23,6 +55,37 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
 @media print{.sidebar,.topbar,.mobile-nav,.page-heading>.button,.notice,.toolbar,.tabs,.row-actions,.toast-area,.footer-note,.week-controls button,.day-head button,.text-button,.panel-foot button{display:none!important}.app-shell{margin:0;padding:0}main{padding:0}body{background:#fff}.panel,.metric,.hero{box-shadow:none;break-inside:avoid}.week-scroll{overflow:visible}.week-grid{min-width:0;grid-template-columns:repeat(7,minmax(0,1fr))}.day-col{padding:0 5px 10px}.overview-grid{grid-template-columns:1fr}.overview-grid>.column-stack:last-child{display:none}.task-row{break-inside:avoid}.hero{min-height:150px}.hero-copy{padding:20px}.hero-art{display:none}.hero{display:block}.task-check{border-color:#777}.subject-card{break-inside:avoid}.task-status-col{display:none}}
 
 .premium-hero{background:linear-gradient(120deg,#f0ecff,#edf5ff);border:1px solid #e1d9fa;border-radius:20px;padding:32px;margin-bottom:22px}.premium-hero h1{font-size:44px;line-height:1.15;margin:20px 0}.premium-hero h2{font-size:30px;letter-spacing:-.8px;margin:15px 0 8px}.premium-hero p{color:#69657f;max-width:610px}.premium-hero-top{display:flex;justify-content:space-between;gap:12px}.plan-pill{display:inline-flex;align-items:center;gap:7px;border-radius:20px;padding:5px 11px;background:#fff;color:#65519e;font-size:11px;font-weight:650;white-space:nowrap}.plan-pill.active{background:#e9f8ef;color:#20794f}.premium-price{font-size:54px;font-weight:750;letter-spacing:-2px;line-height:1.2;margin:17px 0}.premium-price span{font-size:14px;font-weight:500;letter-spacing:0;color:#7c758d}.premium-fine{font-size:11px;line-height:1.8;color:#878299;margin:15px 0}.premium-status{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 15px;background:#ffffffb0;border-radius:10px;margin:17px 0;color:#406b58;font-size:12px}.premium-status span{margin-left:auto}.premium-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.premium-card{border-color:#d6ccf6}.feature-list{padding:0;list-style:none;color:#737587;font-size:12px}.feature-list li{display:flex;gap:10px;margin:14px 0}.feature-list .icon{color:#8974ca;width:17px}.payment-table-wrap{overflow:auto}.payment-table{width:100%;border-collapse:collapse;min-width:820px}.payment-table th{background:#faf9fd;text-align:left;padding:14px 20px;font-size:10px;font-weight:600;color:#88889a}.payment-table td{padding:17px 20px;font-size:12px;border-top:1px solid var(--border);vertical-align:top;max-width:240px;overflow-wrap:anywhere}.payment-table small{display:block;color:#9994a7;font-size:10px;margin-top:6px}.payment-badge{display:inline-block;padding:4px 9px;border-radius:6px;font-size:10px;font-weight:650;background:#f5f3fa}.payment-badge.pending{background:#fff3d6;color:#93692d}.payment-badge.approved{background:#e7f7ed;color:#207d50}.payment-badge.rejected{background:#fff0f2;color:#ae405c}.billing-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}.billing-metrics .eyebrow{font-size:9px}.billing-metrics .metric-value{font-size:30px}.report-callout{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:20px}.report-callout h3{margin:7px 0}.report-actions{display:flex;gap:8px;flex-wrap:wrap;min-width:230px;justify-content:flex-end}.billing-toolbar{display:flex;align-items:end;gap:10px;flex-wrap:wrap;margin:20px 0}.billing-toolbar .field:first-child{flex:1;min-width:200px}.billing-toolbar .field{flex:0 1 150px}.gcash-card{background:#eef4ff;border:1px solid #d7e4ff;border-radius:12px;padding:20px}.gcash-card h3{font-size:15px;margin:11px 0 3px}.gcash-number{font-size:27px;letter-spacing:1px;color:#285da6}.gcash-card p{font-size:11px;color:#72829d}.consent{display:flex;align-items:flex-start;gap:10px;font-size:11px;color:#7a7489;margin-top:17px;line-height:1.6}.consent input{width:17px;min-height:17px;flex-shrink:0;margin:2px 0}.proof-dialog{width:min(760px,calc(100% - 30px))}.receipt-image{display:block;width:100%;max-height:440px;object-fit:contain;background:#f8f8fc;border:1px solid #eee;border-radius:10px;margin:17px 0}.receipt-summary{font-size:12px;color:#7e778c;overflow-wrap:anywhere}.focus-card{text-align:center}.focus-card h2{font-size:72px;letter-spacing:-3px;margin:20px 0;line-height:1.2}.timer-actions{display:flex;justify-content:center;gap:10px;margin-top:18px}.insight-row{margin:18px 0;font-size:12px}.insight-row .bar{margin:8px 0}.insight-row small{font-size:10px;color:#9390a4}#accountSide strong{font-size:12px;overflow-wrap:anywhere}#accountSide p{font-size:10px;overflow-wrap:anywhere;margin:5px 0 10px}.cloud-state{font-size:10px;color:#818799}.cloud-state.error{color:#b4435f}.sidebar-bottom{padding-top:12px}.sidebar .side-note{padding:12px}.sidebar .nav{gap:2px}.sidebar .nav-btn{padding-top:10px;padding-bottom:10px}@media(max-width:700px){.premium-hero{padding:23px}.premium-hero h1{font-size:32px}.premium-hero h2{font-size:24px}.premium-price{font-size:45px}.premium-grid{grid-template-columns:1fr}.billing-metrics{grid-template-columns:1fr;gap:10px}.billing-metrics .panel-pad{padding:18px}.report-callout{display:block}.report-actions{justify-content:flex-start;margin-top:16px}.premium-status span{margin-left:0}.topbar #planBadge{font-size:9px;padding:4px 7px}.mobile-nav{overflow:auto;justify-content:flex-start}.mobile-nav button{flex:1;min-width:60px;font-size:8px}.mobile-nav button span{white-space:nowrap}.billing-toolbar .field{flex:1 1 120px}.sidebar .nav{gap:0}.focus-card h2{font-size:66px}}@media print{.report-actions,.billing-toolbar,.focus-card{display:none!important}.payment-table th,.payment-table td{padding:8px}.payment-table{min-width:0}.billing-metrics{grid-template-columns:repeat(3,1fr)}}
+
+:root{--st-page:#faf9f6;--st-surface:#fff;--st-ink:#272538;--st-muted:#6d6b7e;--st-border:#e8e5ed;--st-accent:#6751d3;--st-accent-hover:#5140b0;--st-tint:#f0edfc;--st-soft:#f4f2f7;--st-success:#267c67;--st-success-bg:#e8f4ee;--st-error:#a73d58;--st-error-bg:#fff1f4;color-scheme:light}
+:root[data-theme=dark]{--st-page:#14131b;--st-surface:#201e2a;--st-ink:#efecf8;--st-muted:#b1abbe;--st-border:#393444;--st-accent:#b9a7ff;--st-accent-hover:#cfc1ff;--st-tint:#302844;--st-soft:#27232f;--st-success:#91dabb;--st-success-bg:#203a32;--st-error:#ffafbf;--st-error-bg:#41252f;color-scheme:dark}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:40px;min-height:40px;padding:9px;border:1px solid var(--st-border);border-radius:50%;background:var(--st-surface);color:var(--st-ink);cursor:pointer;font:inherit;flex-shrink:0}.theme-toggle:hover{background:var(--st-tint)}.theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .theme-sun{display:none}:root[data-theme=dark] .theme-toggle .theme-sun{display:block}:root[data-theme=dark] .theme-toggle .theme-moon{display:none}.theme-toggle:focus-visible{outline:3px solid var(--st-accent);outline-offset:4px}.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
+:root[data-theme=dark]{--ink:var(--st-ink);--muted:var(--st-muted);--border:var(--st-border);--bg:var(--st-page);--white:var(--st-surface);--primary:var(--st-accent);--primary-dark:var(--st-accent-hover);--tint:var(--st-tint);--teal:#8cd3c0;--rose:#ffa5b7;--shadow:0 5px 24px #0002}
+.top-actions .theme-toggle{width:34px;min-width:34px;min-height:34px;height:34px;padding:7px}.planner-home-link{color:var(--muted);font-size:11px;padding:7px;text-decoration:none}.planner-home-link:hover{color:var(--primary)}
+:root[data-theme=dark] :is(.sidebar,.topbar,.panel,.metric,.week-grid,.button.secondary,.task-check,.hero-card,dialog,input,select,textarea,.control,.plan-pill,.next-step .button,.mobile-nav){background:var(--st-surface);border-color:var(--st-border)}
+:root[data-theme=dark] :is(.side-note,.table-head,.payment-table th,.help-note,.receipt-image,.bar,.badge.todo,.badge.neutral,.payment-badge,.day-col.is-today,.button.secondary:hover,.task-row:hover,.task-check:hover,.icon-btn:hover){background:var(--st-soft);border-color:var(--st-border)}
+:root[data-theme=dark] :is(.hero,.premium-hero,.avatar,.nav-btn.active,.mobile-nav button.active,.small-check,.tab:hover){background:var(--st-tint);border-color:var(--st-border)}
+:root[data-theme=dark] .hero-art{background:radial-gradient(circle at 70% 45%,#3c3058,var(--st-tint));border-color:var(--st-border)}
+:root[data-theme=dark] :is(.hero-art:before,.hero-art:after){border-color:#675681}
+:root[data-theme=dark] :is(.brand,.breadcrumbs strong,.task-title,.task-due strong,.subject-mini-name,.empty h3,.field label,.field-label,.button.secondary,.day-card strong){color:var(--st-ink)}
+:root[data-theme=dark] :is(.brand-sub,.nav-label,.nav-btn,.side-note p,.side-version,.date-label,.icon-btn,.metric-top,.metric-foot,.task-meta,.task-due,.table-head,.chart-day,.chart-value,.hero-card p,.mini-count,.day-head small,.day-card small,.day-empty,.list-summary,.footer-note,.footer-note button,.welcome p,.welcome-note,.field small,.feature-list,.premium-hero p,.premium-fine,.premium-price span,.payment-table small,.payment-table th,.consent,.receipt-summary,.insight-row small,.cloud-state,.kbd){color:var(--st-muted)}
+:root[data-theme=dark] :is(.task-row,.panel-foot,.day-head,.table-head,.form-actions,.receipt-image,dialog,.kbd){border-color:var(--st-border)}
+:root[data-theme=dark] :is(.hero p,.help-note,.badge.progress,.nav-btn.active,.mobile-nav button.active,.premium-hero .eyebrow){color:var(--st-accent)}
+:root[data-theme=dark] :is(.next-step,.day-card.session,.premium-status,.plan-pill.active,.payment-badge.approved,.badge.low,.badge.done,.metric-icon.teal){background:var(--st-success-bg);color:var(--st-success);border-color:#385c4d}
+:root[data-theme=dark] :is(.next-step p,.next-step .eyebrow,.next-step .button){color:var(--st-success)}
+:root[data-theme=dark] :is(.notice,.metric-icon,.badge.progress){background:var(--st-tint);color:var(--st-accent);border-color:var(--st-border)}
+:root[data-theme=dark] :is(.notice.warning,.session-warning,.payment-badge.pending,.badge.medium,.metric-icon.amber){background:#3c3020;color:#efc588;border-color:#68502d}
+:root[data-theme=dark] :is(.payment-badge.rejected,.error-message,.button.danger,.badge.high,.metric-icon.rose){background:var(--st-error-bg);color:var(--st-error);border-color:#67404c}
+:root[data-theme=dark] :is(.task-due.overdue strong,.cloud-state.error){color:var(--st-error)}
+:root[data-theme=dark] .task-due.today strong{color:var(--st-accent)}
+:root[data-theme=dark] :is(.button.primary,.task-check.done,.welcome .welcome-icon,.day-col.is-today .day-number){background:#6751d3;color:#fff;border-color:#6751d3}
+:root[data-theme=dark] .button.primary:hover{background:#7962e4}
+:root[data-theme=dark] .gcash-card{background:#202d42;border-color:#34486a}:root[data-theme=dark] .gcash-card :is(p,.gcash-number){color:#a9c8f5}
+:root[data-theme=dark] .color-violet{--accent:#b9a2ef;--light:#342944}:root[data-theme=dark] .color-teal{--accent:#83d0bb;--light:#203a34}:root[data-theme=dark] .color-amber{--accent:#e2bd7b;--light:#3c3223}:root[data-theme=dark] .color-blue{--accent:#a4c3f7;--light:#25344b}:root[data-theme=dark] .color-rose{--accent:#e8a2bd;--light:#432b39}:root[data-theme=dark] .color-slate{--accent:#bbc0d7;--light:#303442}
+:root[data-theme=dark] .chart-bar{background:#594771}:root[data-theme=dark] .chart-day.today .chart-bar{background:var(--st-accent)}
+@media(max-width:700px){.planner-home-link{display:none}.top-actions{gap:7px}.top-actions .theme-toggle{width:32px;min-width:32px;min-height:32px;height:32px}}
+@media print{:root[data-theme=dark]{--ink:#20233b;--muted:#777b8c;--border:#e8e9f1;--bg:#fff;--st-page:#fff;--st-surface:#fff;--st-soft:#f4f2f7;--st-ink:#272538;--st-muted:#6d6b7e;--st-border:#e8e5ed;--st-accent:#6751d3;--st-tint:#f0edfc;color-scheme:light}.theme-toggle{display:none}}
 
 </style>
 </head>
@@ -198,7 +261,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
       </aside>
       <div class="app-shell"><header class="topbar"><div class="breadcrumbs">My workspace<span>/</span><strong id="crumb">Overview</strong></div>
         <button class="brand mobile-brand" data-view="overview" aria-label="StudyTrack overview"><span class="brand-mark">${icon('book')}</span>StudyTrack</button>
-        <div class="top-actions"><button id="planBadge" class="plan-pill" data-view="premium">Free plan</button><span class="date-label">${icon('calendar')}<span id="headerDate"></span></span><button class="icon-btn" data-act="export" aria-label="Export backup" title="Export backup">${icon('download')}</button><button class="avatar" data-view="help" aria-label="Profile and data settings" id="avatar">ST</button></div>
+        <div class="top-actions"><button id="planBadge" class="plan-pill" data-view="premium">Free plan</button><a class="planner-home-link" href="/">Home</a><button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme" title="Switch color theme"><svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 13.2A9 9 0 0 1 10.8 3.2a9 9 0 1 0 10 10Z"/></svg><svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button><span class="date-label">${icon('calendar')}<span id="headerDate"></span></span><button class="icon-btn" data-act="export" aria-label="Export backup" title="Export backup">${icon('download')}</button><button class="avatar" data-view="help" aria-label="Profile and data settings" id="avatar">ST</button></div>
       </header><main id="main" tabindex="-1"><div class="cloud-state" id="cloudState" aria-live="polite"></div><div id="banners"></div><div id="view"></div><footer class="footer-note"><span>StudyTrack · A NEUST student project concept. Not an official university app.</span><button data-view="help">Account & backups</button></footer></main></div>
       <nav class="mobile-nav" aria-label="Mobile navigation">${navItems.map(([view,ico,label])=>`<button data-view="${view}" aria-label="${label}">${icon(ico)}<span>${({overview:'Overview',tasks:'Tasks',week:'Week',subjects:'Subjects',premium:'Premium',tools:'Focus',payments:'Payments',help:'Settings'})[view]}</span></button>`).join('')}</nav>
       <dialog id="modal" aria-labelledby="modalTitle"><div id="modalContent"></div></dialog>

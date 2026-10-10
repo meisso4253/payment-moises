@@ -15,6 +15,8 @@ The first build can succeed without credentials, showing a setup/sign-in screen.
 
 ## Features
 
+- Public landing page at `/` with planner preview, feature overview, and pricing.
+- Light/dark appearance switch across the landing page, planner, sign-in, and privacy notice. Follows the system initially and remembers your choice locally.
 - Subjects, deadlines, tasks, weekly study blocks, and cloud planner saves across devices.
 - Google Identity Services with server-verified tokens and signed database sessions.
 - PNG/JPEG transaction proof, customer name, date, and unique reference number.

@@ -9,6 +9,7 @@ next-env.d.ts
 *.sqlite*
 /.test-data/
 /lib/planner-document.ts
+/lib/theme-document.ts
 .DS_Store
 *.pem
 *-debug.log*
