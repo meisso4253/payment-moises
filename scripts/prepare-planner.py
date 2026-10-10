@@ -7,6 +7,7 @@ body=core.split("function () {",1)[1].rsplit('});',1)[0]
 (root/'lib/planner-core.ts').write_text('// @ts-nocheck\nconst Core=(()=>{'+body+'})();\nexport default Core;\n',encoding='utf-8')
 html=original
 html=re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>','',html)
+html=re.sub(r'<link rel="icon"[^>]*>', '<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=studytrack-book-1">',html)
 html=html.replace('</style>',(root/'lib/premium.css').read_text(encoding='utf-8')+'\n</style>',1)
 html=html.replace('</style>',(root/'lib/theme.css').read_text(encoding='utf-8')+'\n'+(root/'lib/planner-theme.css').read_text(encoding='utf-8')+'\n</style>',1)
 html=html.replace('<title>', '<script>'+(root/'lib/theme-init.js').read_text(encoding='utf-8')+'</script>\n<title>',1)
