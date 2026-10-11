@@ -24,7 +24,7 @@ const Core=(()=>{
     const v = typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,12)}`;
     return `${prefix}-${v}`;
   }
-  function blank(name='') { return {schemaVersion:SCHEMA, updatedAt:0, mode:'personal', profile:{name}, subjects:[], tasks:[], sessions:[]}; }
+  function blank(name='') { return {schemaVersion:SCHEMA, updatedAt:0, mode:'personal', profile:{name}, subjects:[], tasks:[], sessions:[], reviewers:[]}; }
   function sample(now=new Date(), name='') {
     const s=blank(name); s.mode='sample';
     s.subjects=[
@@ -97,6 +97,9 @@ const Core=(()=>{
     unique(output.tasks);
     output.sessions=arr(raw.sessions,5000,'sessions').map(s=>{if(typeof s.done!=='boolean')fail('Invalid session status.');return {id:id(s.id),title:text(s.title,'Session title',140,1),subjectId:subject(s.subjectId),startAt:date(s.startAt,'session date'),durationMinutes:number(s.durationMinutes,5,480,'session duration'),notes:text(s.notes,'Session notes',4000),done:s.done};});
     unique(output.sessions);
+    const rawReviewers=raw.reviewers===undefined?[]:raw.reviewers;
+    output.reviewers=arr(rawReviewers,5000,'reviewers').map(r=>({id:id(r.id),title:text(r.title,'Reviewer title',140,1),subjectId:subject(r.subjectId),color:choice(r.color||'violet',COLORS,'reviewer color'),status:choice(r.status||'todo',STATUS,'reviewer status'),examAt:r.examAt===null||r.examAt===undefined?null:date(r.examAt,'exam date and time'),notes:text(r.notes||'','Reviewer notes',4000),createdAt:iso(r.createdAt||new Date(0).toISOString())}));
+    unique(output.reviewers);
     return output;
   }
   function escapeHTML(v) {return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}

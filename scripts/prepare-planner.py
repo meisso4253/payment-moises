@@ -4,7 +4,7 @@ root=Path(__file__).resolve().parents[1]
 original=(root/'lib/planner-original.html').read_text(encoding='utf-8')
 core=re.findall(r'<script>(.*?)</script>',original,re.S)[0]
 body=core.split("function () {",1)[1].rsplit('});',1)[0]
-(root/'lib/planner-core.ts').write_text('// @ts-nocheck\nconst Core=(()=>{'+body+'})();\nexport default Core;\n',encoding='utf-8')
+(root/'lib/planner-core.ts').write_text('// @ts-nocheck\nconst Core=(()=>{'+body+'})();\nexport default Core;\n',encoding='utf-8',newline='\n')
 html=original
 html=re.sub(r'<meta http-equiv="Content-Security-Policy"[^>]*>','',html)
 html=re.sub(r'<link rel="icon"[^>]*>', '<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=studytrack-book-1">',html)
@@ -36,9 +36,15 @@ html=html[:start]+'''  async function commit(candidate,{force=false,expected=nul
   }
   async function mutate(fn,opts={}){const next=JSON.parse(JSON.stringify(state));fn(next);return commit(next,opts);}
 '''+html[end:]
-for name in ['saveTask','saveSubject','toggleTask']:
+for name in ['saveTask','saveSubject','toggleTask','saveReviewer','toggleReviewer']:
     html=html.replace('  function '+name+'(', '  async function '+name+'(')
 html=html.replace('if(mutate(', 'if(await mutate(').replace('if(commit(', 'if(await commit(')
+html=html.replace("  function renderReviewers(){", "  function renderReviewers(){\n    if(!hasPremium())return renderReviewerAccess();")
+html=html.replace("  function openReviewer(id=null){", "  function openReviewer(id=null){\n    if(!hasPremium())return setView('premium');")
+html=html.replace("  async function saveReviewer(form){", "  async function saveReviewer(form){\n    if(!hasPremium())return formError('Active Premium access is required to save reviewers.');")
+html=html.replace("  async function toggleReviewer(id){", "  async function toggleReviewer(id){if(!hasPremium())return setView('premium');")
+html=html.replace("  async function deleteRecord(kind,id){", "  async function deleteRecord(kind,id){\n    if(kind==='reviewer'&&!hasPremium())return setView('premium');")
+html=html.replace("    if(!await ask('Replace this planner?'", "    if(!hasPremium()&&next.reviewers.length)return toast('Active Premium access is required to import reviewers.',true);\n    if(!await ask('Replace this planner?'")
 html=html.replace("document.addEventListener('submit',event=>", "document.addEventListener('submit',async event=>")
 html=html.replace('help:renderHelp};','help:renderHelp,premium:renderPremium,payments:renderPayments,tools:renderTools};')
 html=html.replace("    $('#view').innerHTML=renderers[ui.view]();", "    accountChrome();\n    $('#view').innerHTML=account?.user&&!loadError?renderers[ui.view]():renderAccess();")
@@ -58,7 +64,7 @@ html=html.replace('No account. No uploads. Data stays in this browser when savin
 html=html.replace('single-user prototype','cloud student planner')
 html=html.replace('Single-user prototype · v0.1.0<br>Dates and times use the device’s current timezone. There is no server, tracking code, or external request in this app.','Cloud student planner · v0.2.0<br>Planner dates follow your device. Payment dates and reports use Asia/Manila. GCash transfers are manually verified by an administrator.')
 html=html.replace('Opened as a local HTML file? Browser saving can vary. Keep the file in the same place and use backups, or run the included local server. Moving the file or switching to a server uses a different storage location.','Backups contain planner data only. Payment records and receipts are stored separately and are never overwritten by planner imports or resets.')
-html=html.replace('This removes tasks, subjects, and study blocks from this app’s storage only.','This removes tasks, subjects, and study blocks from your cloud planner. Payment records and premium access remain.')
+html=html.replace('This removes tasks, subjects, study blocks, and reviewers from this app’s storage only.','This removes tasks, subjects, study blocks, and reviewers from your cloud planner. Payment records and premium access remain.')
 html=html.replace('a local-first student planner MVP.','a cloud student planner with GCash premium access.')
 html=html.replace('No internet connection is needed for the downloaded single-file app.','An internet connection is required for sign-in and cloud saving.')
 html=html.replace("  function setView(view){", "  function setView(view){if(view==='payments'&&!account?.isAdmin)return;")

@@ -5,6 +5,8 @@ import { googleReady,authBindings } from './auth';
 import { PRICE, DAYS, checkedText, referenceKey, proofType, paidDate } from './payments';
 import Core from './planner-core';
 
+type Reviewer = {id:string;subjectId:string|null;title:string;color:string;status:string;examAt:string|null;notes:string;createdAt:string};
+
 export function createStudyApi(storage:typeof receiptStorage=receiptStorage) {
 const bindings=()=>({DB:database,BUCKET:storage,ADMIN_EMAIL:process.env.ADMIN_EMAIL,GCASH_NAME:process.env.GCASH_NAME,GCASH_NUMBER:process.env.GCASH_NUMBER});
 function json(body:unknown,status=200){return Response.json(body,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});}
@@ -77,8 +79,26 @@ async function handler(req:Request){
   if(path==='planner' && req.method==='PUT'){
     if(Number(req.headers.get('content-length'))>4*1024*1024)return fail('Planner is too large.',413);
     const body=await req.json() as {state:unknown,expected:number};
-    const data=Core.validateState(body.state);data.updatedAt=Date.now();
+    let data;try{data=Core.validateState(body.state);}catch(error){return fail(error instanceof Error?error.message:'Invalid planner data.');}
+    data.updatedAt=Date.now();
     const expected=body.expected;if(!Number.isInteger(expected)||expected<0)return fail('Invalid planner version.');
+    const current=await b.DB.prepare('SELECT data,version FROM planners WHERE user_id=?').bind(user.userId).first<{data:string,version:number}>();
+    if((current?.version||0)!==expected)return fail('Your planner changed in another window. Refresh before saving.',409);
+    if(data.reviewers.length){
+      const previous:Reviewer[]=current?Core.validateState(JSON.parse(current.data)).reviewers:[];
+      // Expired members can keep records, remove them, or delete a linked subject.
+      // Creating or changing a reviewer requires a server-verified active grant.
+      const preserved=data.reviewers.every((reviewer:Reviewer)=>{
+        const old=previous.find(r=>r.id===reviewer.id);
+        if(!old)return false;
+        const subjectId=data.subjects.some((s:{id:string})=>s.id===old.subjectId)?old.subjectId:null;
+        return JSON.stringify(reviewer)===JSON.stringify({...old,subjectId});
+      });
+      if(!preserved){
+        const grant=await b.DB.prepare('SELECT MAX(ends_at) AS until FROM grants WHERE user_id=?').bind(user.userId).first<{until:number|null}>();
+        if(!grant?.until||grant.until<=Date.now())return fail('Active Premium access is required to create or edit reviewers.',403);
+      }
+    }
     const version=expected+1;
     const result=expected===0?await b.DB.prepare('INSERT OR IGNORE INTO planners (user_id,data,version) VALUES (?,?,?)').bind(user.userId,JSON.stringify(data),version).run():await b.DB.prepare('UPDATE planners SET data=?,version=? WHERE user_id=? AND version=?').bind(JSON.stringify(data),version,user.userId,expected).run();
     if(result.meta.changes!==1)return fail('Your planner changed in another window. Refresh before saving.',409);

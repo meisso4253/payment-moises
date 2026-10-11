@@ -58,7 +58,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     const v = typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,12)}`;
     return `${prefix}-${v}`;
   }
-  function blank(name='') { return {schemaVersion:SCHEMA, updatedAt:0, mode:'personal', profile:{name}, subjects:[], tasks:[], sessions:[]}; }
+  function blank(name='') { return {schemaVersion:SCHEMA, updatedAt:0, mode:'personal', profile:{name}, subjects:[], tasks:[], sessions:[], reviewers:[]}; }
   function sample(now=new Date(), name='') {
     const s=blank(name); s.mode='sample';
     s.subjects=[
@@ -131,6 +131,9 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     unique(output.tasks);
     output.sessions=arr(raw.sessions,5000,'sessions').map(s=>{if(typeof s.done!=='boolean')fail('Invalid session status.');return {id:id(s.id),title:text(s.title,'Session title',140,1),subjectId:subject(s.subjectId),startAt:date(s.startAt,'session date'),durationMinutes:number(s.durationMinutes,5,480,'session duration'),notes:text(s.notes,'Session notes',4000),done:s.done};});
     unique(output.sessions);
+    const rawReviewers=raw.reviewers===undefined?[]:raw.reviewers;
+    output.reviewers=arr(rawReviewers,5000,'reviewers').map(r=>({id:id(r.id),title:text(r.title,'Reviewer title',140,1),subjectId:subject(r.subjectId),color:choice(r.color||'violet',COLORS,'reviewer color'),status:choice(r.status||'todo',STATUS,'reviewer status'),examAt:r.examAt===null||r.examAt===undefined?null:date(r.examAt,'exam date and time'),notes:text(r.notes||'','Reviewer notes',4000),createdAt:iso(r.createdAt||new Date(0).toISOString())}));
+    unique(output.reviewers);
     return output;
   }
   function escapeHTML(v) {return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -178,7 +181,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     localStorage.setItem('studytrack_storage_test','1');localStorage.removeItem('studytrack_storage_test');
   } catch {storageIssue=true;}
   const ui={view:'overview',week:C.weekStart(new Date()),filters:{query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'},formVersion:0};
-  const navItems=[['overview','grid','Overview'],['tasks','tasks','All tasks'],['week','calendar','Weekly planner'],['subjects','subjects','Subjects'],['help','settings','Data & help']];
+  const navItems=[['overview','grid','Overview'],['tasks','tasks','All tasks'],['week','calendar','Weekly planner'],['reviewers','book','Reviewers'],['subjects','subjects','Subjects'],['help','settings','Data & help']];
   const initialHash=location.hash.slice(1);if(navItems.some(n=>n[0]===initialHash))ui.view=initialHash;
   const statusLabel={todo:'To do',progress:'In progress',done:'Completed'};
   const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -203,7 +206,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
         <button class="brand mobile-brand" data-view="overview" aria-label="StudyTrack overview"><span class="brand-mark">${icon('book')}</span>StudyTrack</button>
         <div class="top-actions"><span class="date-label">${icon('calendar')}<span id="headerDate"></span></span><button class="icon-btn" data-act="export" aria-label="Export backup" title="Export backup">${icon('download')}</button><button class="avatar" data-view="help" aria-label="Profile and data settings" id="avatar">ST</button></div>
       </header><main id="main" tabindex="-1"><div id="banners"></div><div id="view"></div><footer class="footer-note"><span>StudyTrack · A NEUST student project concept. Not an official university app.</span><button data-view="help">Stored locally · About this MVP</button></footer></main></div>
-      <nav class="mobile-nav" aria-label="Mobile navigation">${navItems.map(([view,ico,label])=>`<button data-view="${view}" aria-label="${label}">${icon(ico)}<span>${({overview:'Overview',tasks:'Tasks',week:'Week',subjects:'Subjects',help:'Data & help'})[view]}</span></button>`).join('')}</nav>
+      <nav class="mobile-nav" aria-label="Mobile navigation">${navItems.map(([view,ico,label])=>`<button data-view="${view}" aria-label="${label}">${icon(ico)}<span>${({overview:'Overview',tasks:'Tasks',week:'Week',reviewers:'Review',subjects:'Subjects',help:'Data & help'})[view]}</span></button>`).join('')}</nav>
       <dialog id="modal" aria-labelledby="modalTitle"><div id="modalContent"></div></dialog>
       <dialog id="confirmDialog" aria-labelledby="confirmTitle"><div class="dialog-head"><div><h2 id="confirmTitle"></h2></div><button class="icon-btn" data-act="confirm-no" aria-label="Cancel">${icon('x')}</button></div><div class="dialog-body"><p id="confirmText" class="confirm-text"></p><div class="form-actions"><button class="button secondary" data-act="confirm-no">Cancel</button><button class="button primary" data-act="confirm-yes" id="confirmYes">Continue</button></div></div></dialog>
       <div class="toast-area" id="toasts" aria-live="polite" aria-atomic="false"></div><input type="file" id="importFile" accept=".json,application/json" hidden>
@@ -260,7 +263,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     for(const b of document.querySelectorAll('[data-view]')){const active=b.dataset.view===ui.view;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}
     $('#crumb').textContent=navItems.find(n=>n[0]===ui.view)[2];$('#avatar').textContent=initials();$('#headerDate').textContent=fmtDate(new Date(),{weekday:'short',month:'short',day:'numeric',year:'numeric'});$('#navTaskCount').textContent=C.stats(state).open;
     storageBanners();
-    const renderers={overview:renderOverview,tasks:renderTasks,week:renderWeek,subjects:renderSubjects,help:renderHelp};
+    const renderers={overview:renderOverview,tasks:renderTasks,week:renderWeek,reviewers:renderReviewers,subjects:renderSubjects,help:renderHelp};
     $('#view').innerHTML=renderers[ui.view]();
     if(ui.view==='tasks')updateTaskResults();
   }
@@ -332,6 +335,16 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     $('#resultCount').textContent=`Showing ${rows.length} of ${state.tasks.length} tasks`;
     for(const btn of document.querySelectorAll('[data-act="task-tab"]')){const active=btn.dataset.status===f.status;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
   }
+  function renderReviewers(){
+    const items=[...state.reviewers].sort((a,b)=>{const ad=a.examAt||'9999-12-31T23:59',bd=b.examAt||'9999-12-31T23:59';return ad.localeCompare(bd)||a.title.localeCompare(b.title);});
+    const exams=[...state.tasks.filter(t=>t.type==='Exam'&&t.status!=='done').map(t=>({kind:'exam',at:t.dueAt,title:t.title,subjectId:t.subjectId,id:t.id})),...state.reviewers.filter(r=>r.examAt&&r.status!=='done').map(r=>({kind:'review',at:r.examAt,title:r.title,subjectId:r.subjectId,id:r.id}))].filter(t=>C.parseLocal(t.at)>=new Date()).sort((a,b)=>a.at.localeCompare(b.at));
+    return `${heading('REVIEW SMARTER','Your reviewers, with a progress tracker.','Keep your review materials separate from assignments and see exam schedules at a glance.',`<button class="button primary" data-act="add-reviewer">${icon('plus')}Add reviewer</button>`)}
+      <div class="reviewer-layout"><section class="panel"><div class="panel-head"><div><h2>Reviewers</h2><p class="panel-sub">Track what you still need to review.</p></div><span class="badge neutral">${items.length} total</span></div>
+      ${items.length?items.map(r=>{const sub=subjectOf(r.subjectId);return `<div class="reviewer-row color-${r.color}"><button class="task-check ${r.status==='done'?'done':''}" data-act="toggle-reviewer" data-id="${r.id}" aria-label="${r.status==='done'?'Reopen':'Complete'} ${E(r.title)}">${r.status==='done'?icon('check'):''}</button><button class="reviewer-body" data-act="edit-reviewer" data-id="${r.id}"><strong>${E(r.title)}</strong><span><span class="subject-code">${E(sub.code||sub.name)}</span> · ${r.examAt?`Exam ${smallDate(r.examAt)} · ${fmtTime(C.parseLocal(r.examAt))}`:'No exam scheduled'}</span></button><span class="badge ${r.status}">${statusLabel[r.status]}</span><button class="icon-btn" data-act="edit-reviewer" data-id="${r.id}" aria-label="Edit ${E(r.title)}">${icon('edit')}</button><button class="icon-btn" data-act="delete-reviewer" data-id="${r.id}" aria-label="Delete ${E(r.title)}">${icon('trash')}</button></div>`;}).join(''):empty('No reviewers yet.','Add a reviewer, set its status, and optionally attach an exam date and time.',`<button class="button soft small" data-act="add-reviewer">${icon('plus')}Add reviewer</button>`,'book')}
+      </section><aside class="panel exam-side"><div class="panel-head"><div><h2>Exam schedule</h2><p class="panel-sub">Upcoming exams and their times.</p></div>${icon('calendar')}</div>
+      ${exams.length?exams.slice(0,8).map(t=>`<button class="exam-item" data-act="${t.kind==='exam'?'edit-task':'edit-reviewer'}" data-id="${t.id}"><span class="exam-date">${fmtDate(C.parseLocal(t.at),{month:'short',day:'numeric'})}</span><span><strong>${E(t.title)}</strong><small>${fmtTime(C.parseLocal(t.at))} · ${E(subjectOf(t.subjectId).code||subjectOf(t.subjectId).name)}</small></span></button>`).join(''): '<div class="empty" style="padding:30px 18px"><div class="empty-symbol">'+icon('calendar')+'</div><h3>No exams scheduled</h3><p>Add an Exam task to see it here.</p></div>'}
+      </aside></div>`;
+  }
   function renderSubjects(){
     return `${heading('EVERY SUBJECT HAS ITS SPACE','Keep your courses together.','Add your subjects, then organize the tasks that belong to them.',`<button class="button primary" data-act="add-subject">${icon('plus')}Add subject</button>`)}
       ${state.subjects.length?`<div class="subjects-grid">${state.subjects.map(s=>{const ts=state.tasks.filter(t=>t.subjectId===s.id),done=ts.filter(t=>t.status==='done').length;return `<section class="panel subject-card color-${s.color}"><div class="subject-card-top"><span class="subject-symbol">${E((s.code||s.name).slice(0,2))}</span><div><button class="icon-btn" data-act="edit-subject" data-id="${s.id}" aria-label="Edit subject ${E(s.name)}">${icon('edit')}</button><button class="icon-btn" data-act="delete-subject" data-id="${s.id}" aria-label="Delete subject ${E(s.name)}">${icon('trash')}</button></div></div><p class="eyebrow" style="color:var(--accent);margin-bottom:4px">${E(s.code||'SUBJECT')}</p><h3>${E(s.name)}</h3><div class="bar"><span style="width:${ts.length?Math.round(done/ts.length*100):0}%"></span></div><div class="subject-card-bottom"><span>${done}/${ts.length} completed</span><button class="text-button" data-act="subject-tasks" data-id="${s.id}">View tasks ${icon('arrow')}</button></div></section>`;}).join('')}</div>`:`<section class="panel">${empty('Your subjects belong here.','Add a course name and a color to give your requirements a home.',`<button class="button primary" data-act="add-subject">${icon('plus')}Add your first subject</button>`,'subjects')}</section>`}
@@ -357,7 +370,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
       <section class="panel panel-pad"><h3>Keep a copy of your work</h3><p>Export a JSON backup before clearing browser data, changing devices, or replacing this file. Import restores a backup by replacing the current planner.</p><button class="button secondary" data-act="export">${icon('download')}Export backup</button><button class="button secondary" data-act="import">${icon('upload')}Import backup</button>${corruptRaw?'<p><strong>Unreadable saved data found.</strong></p><button class="button danger" data-act="recover">Download unreadable data</button>':''}<div class="help-note">Opened as a local HTML file? Browser saving can vary. Keep the file in the same place and use backups, or run the included local server. Moving the file or switching to a server uses a different storage location.</div></section>
       <section class="panel panel-pad"><h3>Try a classroom walkthrough</h3><ol><li>Add a subject, such as Engineering Economy.</li><li>Add an assignment, due date, and priority.</li><li>Open Weekly planner and schedule a study block.</li><li>Mark the assignment complete and check Overview.</li><li>Export your data, reload the app, and check your work.</li></ol><p>Keyboard shortcut: <span class="kbd">N</span> adds a task when you are not typing. <span class="kbd">Esc</span> closes a dialog.</p><button class="button secondary" data-act="sample">${icon('spark')}Load sample planner</button></section>
       <section class="panel panel-pad"><h3>Why StudyTrack?</h3><p>Your supplied survey summary records 35 selections for heavy academic workload / overlapping deadlines, 30 for time-management problems, and 18 votes for a Student Planner / Digital Study Organizer App.</p><p>This MVP tests the proposed workflow. It does not prove an improvement in grades, reduced stress, or willingness to pay.</p><p class="small-label">Sources: <em>Quiz2_Customers_Segmentation_and_Needs-1 (1).pdf</em>, pp. 2–3; <em>TECHNO MODULE 2 - 6.pdf</em>, printed p. 16 (MVP definition). These are the group’s supplied materials, not new research.</p></section>
-      <section class="panel panel-pad"><h3>Reset this planner</h3><p>Start with an empty planner. This removes tasks, subjects, and study blocks from this app’s storage only. Export first to keep a copy.</p><button class="button danger" data-act="fresh">${icon('trash')}Start fresh</button><p class="help-note">Single-user prototype · v0.1.0<br>Dates and times use the device’s current timezone. There is no server, tracking code, or external request in this app.</p></section></div>`;
+      <section class="panel panel-pad"><h3>Reset this planner</h3><p>Start with an empty planner. This removes tasks, subjects, study blocks, and reviewers from this app’s storage only. Export first to keep a copy.</p><button class="button danger" data-act="fresh">${icon('trash')}Start fresh</button><p class="help-note">Single-user prototype · v0.1.0<br>Dates and times use the device’s current timezone. There is no server, tracking code, or external request in this app.</p></section></div>`;
   }
   function modalHead(title,subtitle){return `<div class="dialog-head"><div><h2 id="modalTitle">${title}</h2><p>${subtitle}</p></div><button class="icon-btn" data-act="close-modal" aria-label="Close dialog">${icon('x')}</button></div>`;}
   function openModal(html,kind=''){ui.formVersion=state.updatedAt;$('#modalContent').innerHTML=html;$('#modal').className=kind;if(!$('#modal').open)$('#modal').showModal();}
@@ -400,6 +413,18 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     const record={id:id||C.uid('subject'),name,code,color:String(f.get('color'))};
     if(mutate(s=>{if(id)s.subjects=s.subjects.map(x=>x.id===id?record:x);else s.subjects.push(record);},{expected:ui.formVersion})){closeModal();toast(id?'Subject updated.':'Subject added.');}
   }
+  function openReviewer(id=null){
+    const existing=id?state.reviewers.find(r=>r.id===id):null;if(id&&!existing)return;
+    const r=existing||{id:'',title:'',subjectId:null,color:'violet',status:'todo',examAt:null,notes:''};
+    openModal(`${modalHead(existing?'Edit reviewer':'Add a reviewer','Track review progress and optionally link it to an exam schedule.')}<div class="dialog-body"><form id="reviewerForm" data-id="${r.id}"><div class="form-grid"><div class="field full"><label for="reviewerTitle">Reviewer title *</label><input id="reviewerTitle" name="title" required maxlength="140" value="${E(r.title)}" placeholder="e.g. PS21 formula reviewer" autofocus></div><div class="field full"><label for="reviewerSubject">Subject</label><select id="reviewerSubject" name="subjectId">${subjectOptions(r.subjectId)}</select></div><div class="field"><label for="reviewerDate">Exam date (optional)</label><input id="reviewerDate" name="date" type="date" min="1900-01-01" max="2200-12-31" value="${r.examAt?r.examAt.slice(0,10):''}"></div><div class="field"><label for="reviewerTime">Exam time (optional)</label><input id="reviewerTime" name="time" type="time" value="${r.examAt?r.examAt.slice(11,16):''}"></div><div class="field"><label for="reviewerStatus">Review status</label><select id="reviewerStatus" name="status">${C.STATUS.map(st=>`<option value="${st}" ${r.status===st?'selected':''}>${statusLabel[st]}</option>`).join('')}</select></div><fieldset class="field" style="border:0;padding:0;margin:0"><legend class="field-label">Color</legend><div class="swatches">${C.COLORS.map(color=>`<label class="swatch-label color-${color}"><input type="radio" name="color" value="${color}" aria-label="${cap(color)}" ${((r.color||'violet')===color)?'checked':''}><span class="swatch-circle"></span></label>`).join('')}</div></fieldset><div class="field full"><label for="reviewerNotes">Notes (optional)</label><textarea id="reviewerNotes" name="notes" maxlength="4000" placeholder="Topics, chapters, formulas, or links to your notes…">${E(r.notes||'')}</textarea></div></div><p id="formError" class="error-message" role="alert" hidden></p><div class="form-actions">${existing?`<button type="button" class="icon-btn delete-action" data-act="delete-reviewer" data-id="${r.id}" aria-label="Delete this reviewer">${icon('trash')}</button>`:''}<button type="button" class="button secondary" data-act="close-modal">Cancel</button><button type="submit" class="button primary">${existing?'Save changes':'Add reviewer'}</button></div></form></div>`);
+  }
+  function saveReviewer(form){
+    clearFormError();if(!form.reportValidity())return;const f=new FormData(form),id=form.dataset.id,title=String(f.get('title')).trim();if(!title)return formError('Please enter a reviewer title.');
+    const date=String(f.get('date')||''),time=String(f.get('time')||'');let examAt=null;if(date||time){if(!date||!time)return formError('Enter both the exam date and exam time, or leave both empty.');examAt=`${date}T${time}`;if(!C.parseLocal(examAt))return formError('Enter a valid exam date and time.');}
+    const old=state.reviewers.find(r=>r.id===id),record={id:id||C.uid('review'),title,subjectId:f.get('subjectId')||null,color:String(f.get('color')||'violet'),status:String(f.get('status')),examAt,notes:String(f.get('notes')||'').trim(),createdAt:old?.createdAt||new Date().toISOString()};
+    if(mutate(s=>{if(id)s.reviewers=s.reviewers.map(x=>x.id===id?record:x);else s.reviewers.push(record);},{expected:ui.formVersion})){closeModal();toast(old?'Reviewer updated.':'Reviewer added.');}
+  }
+  function toggleReviewer(id){const r=state.reviewers.find(x=>x.id===id);if(!r)return;mutate(s=>{const x=s.reviewers.find(x=>x.id===id);x.status=x.status==='done'?'todo':'done';});}
   function openSession(id=null,day=null,task=null){
     const now=new Date(),value=day?`${day}T18:00`:`${C.dateKey(now)}T18:00`;
     const s=id?state.sessions.find(s=>s.id===id):{id:'',title:task?`Study: ${task.title}`.slice(0,140):'',subjectId:task?.subjectId||null,startAt:value,durationMinutes:task?.effortMinutes?Math.max(5,Math.min(task.effortMinutes,480)):45,notes:'',done:false};if(!s)return;
@@ -416,11 +441,11 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     if(mutate(s=>{const t=s.tasks.find(t=>t.id===id);t.status=t.status==='done'?'todo':'done';t.completedAt=t.status==='done'?new Date().toISOString():null;}))toast(previous==='done'?'Task reopened.':'One less thing on your list. Well done!',false,()=>mutate(s=>{const t=s.tasks.find(t=>t.id===id);if(t){t.status=previous;t.completedAt=previousCompleted;}}));
   }
   async function deleteRecord(kind,id){
-    const collection=kind==='task'?'tasks':kind==='subject'?'subjects':'sessions',record=state[collection].find(r=>r.id===id);if(!record)return;
+    const collection=kind==='task'?'tasks':kind==='subject'?'subjects':kind==='session'?'sessions':'reviewers',record=state[collection].find(r=>r.id===id);if(!record)return;
     const title=kind==='subject'?record.name:record.title;
-    const message=kind==='subject'?`Remove “${title}”? Its tasks and study blocks will move to General, not be deleted.`:`Remove “${title}” from your planner? Export a backup first to keep a copy.`;
+    const message=kind==='subject'?`Remove “${title}”? Its tasks, study blocks, and reviewers will move to General, not be deleted.`:`Remove “${title}” from your planner? Export a backup first to keep a copy.`;
     if(!await ask(`Delete ${kind==='session'?'study block':kind}?`,message,'Delete',true))return;
-    if(mutate(s=>{s[collection]=s[collection].filter(r=>r.id!==id);if(kind==='subject'){s.tasks.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});s.sessions.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});}})){
+    if(mutate(s=>{s[collection]=s[collection].filter(r=>r.id!==id);if(kind==='subject'){s.tasks.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});s.sessions.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});s.reviewers.forEach(t=>{if(t.subjectId===id)t.subjectId=null;});}})){
       if(kind==='subject'&&ui.filters.subject===id){ui.filters.subject='all';render();}if($('#modal').open)closeModal();toast(`${kind==='session'?'Study block':cap(kind)} deleted.`);
     }
   }
@@ -433,12 +458,12 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     if(file.size>8*1024*1024){toast('Backup is too large. Maximum file size is 8 MB.',true);return;}
     let next;
     try{next=C.validateState(JSON.parse(await file.text()));}catch(err){toast(`Cannot import: ${err.message}`,true);return;}
-    if(!await ask('Replace this planner?',`This backup contains ${next.tasks.length} tasks, ${next.subjects.length} subjects, and ${next.sessions.length} study blocks. Importing replaces everything currently in this planner. Export your current data first to keep it.`,'Import and replace'))return;
+    if(!await ask('Replace this planner?',`This backup contains ${next.tasks.length} tasks, ${next.subjects.length} subjects, and ${next.sessions.length} study blocks, and ${next.reviewers.length} reviewers. Importing replaces everything currently in this planner. Export your current data first to keep it.`,'Import and replace'))return;
     if(commit(next,{force:true})){firstRun=false;ui.filters={query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'};setView('overview');toast('Backup restored.');}
   }
   function welcome(){openModal(`<div class="welcome-icon">${icon('book')}</div><div class="dialog-body"><h2 id="modalTitle">A calmer place<br>for your student life.</h2><p>Meet StudyTrack. Organize your subjects, keep deadlines in sight, and make a little space to study.</p><div class="field"><label for="welcomeName">What should we call you? (optional)</label><input id="welcomeName" maxlength="40" placeholder="Your first name" autocomplete="off"></div><div class="welcome-options"><button class="button primary" data-act="welcome-sample">${icon('spark')}Try the sample planner</button><button class="button secondary" data-act="welcome-fresh">Start empty ${icon('arrow')}</button></div><p class="welcome-note">No account. No uploads. Data stays in this browser when saving is available. Sample tasks are fictional.</p></div>`,'welcome');}
   async function replacePlanner(mode,initial=false){
-    if(!initial&&!await ask(mode==='sample'?'Load the sample planner?':'Start with a clean planner?','This replaces all current tasks, subjects, and study blocks. Export your current planner first to keep a copy.',mode==='sample'?'Load sample':'Start fresh',true))return;
+    if(!initial&&!await ask(mode==='sample'?'Load the sample planner?':'Start with a clean planner?','This replaces all current tasks, subjects, study blocks, and reviewers. Export your current planner first to keep a copy.',mode==='sample'?'Load sample':'Start fresh',true))return;
     const name=initial?($('#welcomeName')?.value.trim()||''):state.profile.name;
     if(commit(mode==='sample'?C.sample(new Date(),name):C.blank(name),{force:true})){firstRun=false;closeModal();ui.filters={query:'',subject:'all',priority:'all',status:'all',period:'all',sort:'deadline'};setView('overview');toast(mode==='sample'?'Sample planner loaded. All example data is fictional.':'Your planner is ready. Start by adding a subject or a task.');}
   }
@@ -450,6 +475,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
     switch(act){
       case 'add-task':openTask();break;case 'edit-task':openTask(id);break;case 'toggle-task':toggleTask(id);break;
       case 'add-subject':openSubject();break;case 'edit-subject':openSubject(id);break;
+      case 'add-reviewer':openReviewer();break;case 'edit-reviewer':openReviewer(id);break;case 'toggle-reviewer':toggleReviewer(id);break;case 'delete-reviewer':await deleteRecord('reviewer',id);break;
       case 'add-session':openSession(null,el.dataset.day||null);break;case 'edit-session':openSession(id);break;
       case 'plan-next':openSession(null,null,state.tasks.find(t=>t.id===id)||null);break;
       case 'delete-task':await deleteRecord('task',id);break;case 'delete-subject':await deleteRecord('subject',id);break;case 'delete-session':await deleteRecord('session',id);break;
@@ -468,6 +494,7 @@ dialog{border:1px solid #e6e1f1;padding:0;border-radius:19px;box-shadow:0 30px 1
   document.addEventListener('submit',event=>{
     const form=event.target;event.preventDefault();
     if(form.id==='taskForm')saveTask(form);
+    else if(form.id==='reviewerForm')saveReviewer(form);
     else if(form.id==='subjectForm')saveSubject(form);
     else if(form.id==='sessionForm')saveSession(form);
     else if(form.id==='profileForm'){if(mutate(s=>{s.profile.name=$('#profileName').value.trim();}))toast('Display name updated.');}

@@ -8,7 +8,7 @@ Student planner with shared accounts, GCash premium access (PHP 49 for 120 days)
 2. Open **Premium**, send PHP 49 to the displayed GCash recipient in the GCash app, and submit a PNG/JPEG receipt, reference, full customer name, and payment date. This is a manual transfer, not a payment gateway or automatic debit.
 3. The configured administrator signs in, opens **Payments**, checks the receipt against the receiving GCash account, and approves or rejects it with a review note.
 4. Approval starts 120 days of premium access. Renewals extend from the later of the current expiry or approval time. Rejection grants no access. Each payment can grant access once.
-5. Premium adds an adjustable focus timer, subject workload/completion insights, and a progress CSV export. The timer works while the page is open.
+5. Premium adds a Reviewers tab with subject links, notes, colors, review statuses, and an upcoming exam schedule, plus an adjustable focus timer, subject workload/completion insights, and a progress CSV export. Reviewers save with the cloud planner and are included in JSON backups. Creating or editing reviewers requires active premium access checked on the server; expired accounts retain their records and can still export backups, reset their planner, and remove subjects. The timer works while the page is open.
 6. For semester submission, open **Payments**, set the payment date range, and download **Report + proof files (.zip)**. Unzip the entire folder, open `Semester-report.html`, and print/save it if needed. The package also includes `Tabulation.csv` and all matching receipt image files. Only approved payments within the date range count; the search and status filter do not change exports.
 
 ## Access and storage
