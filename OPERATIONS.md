@@ -11,6 +11,12 @@ Student planner with shared accounts, GCash premium access (PHP 49 for 120 days)
 5. Premium adds a Reviewers tab with subject links, notes, colors, review statuses, and an upcoming exam schedule, plus an adjustable focus timer, subject workload/completion insights, and a progress CSV export. Reviewers save with the cloud planner and are included in JSON backups. Creating or editing reviewers requires active premium access checked on the server; expired accounts retain their records and can still export backups, reset their planner, and remove subjects. The timer works while the page is open.
 6. For semester submission, open **Payments**, set the payment date range, and download **Report + proof files (.zip)**. Unzip the entire folder, open `Semester-report.html`, and print/save it if needed. The package also includes `Tabulation.csv` and all matching receipt image files. Only approved payments within the date range count; the search and status filter do not change exports.
 
+## Installing StudyTrack
+
+Use **Get the app** on the landing page, or **Install StudyTrack** in Data & help. Supported browsers offer their native installation prompt; other browsers receive device-specific instructions. The app launches at `/study`, with shortcuts for tasks and the weekly planner. Installation is free and preserves the existing account and Premium plan.
+
+The service worker caches only the connection screen and public app icons. Account responses, planner pages, authentication, payments, and receipts stay network-only. Sign-in and cloud features require internet. `node scripts/pwa-check.mjs` checks the app assets and caching boundaries. The service worker is served without caching so browsers can detect updates.
+
 ## Access and storage
 
 Google sign-in uses Google Identity Services and Better Auth. The server verifies Google's signed identity token for the configured client ID, then stores a database session in a signed HttpOnly cookie. The Google provider subject owns the provider account. Every protected API checks the session and verified email; administrative routes compare the authenticated email with `ADMIN_EMAIL`. Browser state cannot grant premium or administrator access. Only Google sign-in is exposed; email/password registration and other authentication endpoints are disabled.
